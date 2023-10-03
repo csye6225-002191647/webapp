@@ -26,7 +26,7 @@ exports.createAssignment = async (req, res) => {
   // Save in the database
   Assignment.create(assignment)
     .then(data => {
-      res.send(data);
+      res.status(201).send(data);
     })
     .catch(err => {
       res.status(500).send({
@@ -40,7 +40,7 @@ exports.createAssignment = async (req, res) => {
 exports.getAllAssignments = (req, res) => {
     Assignment.findAll()
       .then(data => {
-        res.send(data);
+        res.status(200).send(data);
       })
       .catch(err => {
         res.status(500).send({
@@ -57,7 +57,7 @@ exports.getAssignmentById = (req, res) => {
     Assignment.findByPk(id)
       .then(data => {
         if (data) {
-          res.send(data);
+          res.status(200).send(data);
         } else {
           res.status(404).send({
             message: `Cannot find Assignment with id=${id}.`
@@ -86,11 +86,11 @@ exports.deleteAssignmentById = async(req, res) => {
           })
             .then(num => {
               if (num == 1) {
-                res.send({
+                res.status(204).send({
                   message: "Assignment was deleted successfully!"
                 });
               } else {
-                res.send({
+                res.status(404).send({
                   message: `Cannot delete Assignment with id=${id}. Maybe Assignment was not found!`
                 });
               }
@@ -124,18 +124,18 @@ exports.updateAssignmentById = async(req, res) => {
     })
         .then(num => {
         if (num == 1) {
-            res.send({
-            message: "Assignment was updated successfully."
+            res.status(204).send({
+                message: "Assignment was updated successfully."
             });
         } else {
-            res.send({
-            message: `Cannot update Assignment with id=${id}. Maybe Assignment was not found or req.body is empty!`
+            res.status(404).send({
+                message: `Cannot update Assignment with id=${id}. Maybe Assignment was not found or req.body is empty!`
             });
         }
         })
         .catch(err => {
         res.status(500).send({
-            message: "Error updating Assignment with id=" + id + ": Cannot update the user"
+            message: "Error updating Assignment with id=" + id
         });
         });
     } else {
