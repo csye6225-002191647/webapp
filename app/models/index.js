@@ -44,12 +44,12 @@ db.syncDB = () => {
         const rowData = {};
         // Map CSV values to model attributes
         const indexOfPassword = columnNames.indexOf('password');
-        
+
         columnNames.forEach((colName, index) => {
           if(index === indexOfPassword){
             const hashedPassword = bcrypt.hashSync(rowValues[index],10)
             rowData[colName] = hashedPassword;
-          }else{
+          } else {
             rowData[colName] = rowValues[index];
           }
         });
@@ -58,7 +58,6 @@ db.syncDB = () => {
       }
       console.log('Data imported successfully');
     } catch (error) {
-      console.log(error);
       console.log(error.errors[0].message);
     }
   });
