@@ -1,0 +1,41 @@
+name: Node.js CI
+
+on:
+#   pull_request:
+#     types:
+#       - opened
+    push:
+        branches: 
+        - feature_5.0
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+            ENVIRONMENT: DEV
+            PORT: 8080
+            DATABASE: jarvis
+            HOSTNAME: localhost
+            DBUSER: jarvis
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run tests
+        run: npm test
