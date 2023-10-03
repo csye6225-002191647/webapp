@@ -1,9 +1,9 @@
 const db = require("../models/index");
 const Assignment = db.assignment;
-const {Op} = require('sequelize');
+const User = db.users;
 
 // Create and Save a new Assignment
-exports.createAssignment = (req, res) => {
+exports.createAssignment = async (req, res) => {
   // Validate request
   if (!req.body.name) {
     res.status(400).send({
@@ -12,16 +12,19 @@ exports.createAssignment = (req, res) => {
     return;
   }
 
+    const { id } = req.user.dataValues
+
   // Create a Assignment
-  const assignmet = {
+  const assignment = {
     name: req.body.name,
     points: req.body.points,
     num_of_attempts: req.body.num_of_attempts,
-    deadline : req.body.deadline
+    deadline : req.body.deadline,
+    user_id: id
   };
 
-  // Save Tutorial in the database
-  Assignment.create(assignmet)
+  // Save in the database
+  Assignment.create(assignment)
     .then(data => {
       res.send(data);
     })
@@ -33,11 +36,8 @@ exports.createAssignment = (req, res) => {
     });
 };
 
-// Retrieve all Assignment from the database.
+// Retrieve all Assignment from the database
 exports.getAllAssignments = (req, res) => {
-    const name = req.query.name;
-    var condition = name ? { name: { [Op.iLike]: `%${name}%` } } : null;
-  
     Assignment.findAll()
       .then(data => {
         res.send(data);
@@ -50,6 +50,7 @@ exports.getAllAssignments = (req, res) => {
       });
   };
 
+// Retrieve Assignment from the database
 exports.getAssignmentById = (req, res) => {
     const id = req.params.id;
   
@@ -70,52 +71,78 @@ exports.getAssignmentById = (req, res) => {
       });
   };
 
-exports.deleteAssignmentById = (req, res) => {
+// Delete Assignment from the database
+exports.deleteAssignmentById = async(req, res) => {
     const id = req.params.id;
-  
-    Assignment.destroy({
-      where: { id: id }
-    })
-      .then(num => {
-        if (num == 1) {
-          res.send({
-            message: "Assignment was deleted successfully!"
-          });
-        } else {
-          res.send({
-            message: `Cannot delete Assignment with id=${id}. Maybe Assignment was not found!`
-          });
-        }
-      })
-      .catch(err => {
-        res.status(500).send({
-          message: "Could not delete Assignment with id=" + id
-        });
+    const {user_id} = await Assignment.findOne({
+        where: { id: id }
       });
+  
+    const user_id_header = req.user.dataValues.id
+  
+    if(user_id_header === user_id) {
+        Assignment.destroy({
+            where: { id: id }
+          })
+            .then(num => {
+              if (num == 1) {
+                res.send({
+                  message: "Assignment was deleted successfully!"
+                });
+              } else {
+                res.send({
+                  message: `Cannot delete Assignment with id=${id}. Maybe Assignment was not found!`
+                });
+              }
+            })
+            .catch(err => {
+              res.status(500).send({
+                message: "Could not delete Assignment with id=" + id
+              });
+            });
+    } else {
+        res.status(401).send({
+            message: "You are not authorized to delete this assignment"
+        });
+    }
   };
 
-  exports.updateAssignmentById = (req, res) => {
+// Update Assignment from the database
+exports.updateAssignmentById = async(req, res) => {
     const id = req.params.id;
-  
-    Assignment.update(req.body, {
-      where: { id: id }
-    })
-      .then(num => {
-        if (num == 1) {
-          res.send({
-            message: "Assignment was updated successfully."
-          });
-        } else {
-          res.send({
-            message: `Cannot update Assignment with id=${id}. Maybe Assignment was not found or req.body is empty!`
-          });
-        }
-      })
-      .catch(err => {
-        res.status(500).send({
-          message: "Error updating Assignment with id=" + id
+
+    const { user_id } = await Assignment.findOne({
+        where: { id: id }
         });
-      });
-  };
+
+    const user_id_header = req.user.dataValues.id
+
+    if(user_id_header === user_id) {
+
+    Assignment.update(req.body, {
+        where: { id: id }
+    })
+        .then(num => {
+        if (num == 1) {
+            res.send({
+            message: "Assignment was updated successfully."
+            });
+        } else {
+            res.send({
+            message: `Cannot update Assignment with id=${id}. Maybe Assignment was not found or req.body is empty!`
+            });
+        }
+        })
+        .catch(err => {
+        res.status(500).send({
+            message: "Error updating Assignment with id=" + id + ": Cannot update the user"
+        });
+        });
+    } else {
+        res.status(401).send({
+            message: "You are not authorized to update this assignment"
+        });
+    }
+};
 
   

@@ -14,10 +14,10 @@ const {
 } = require('../controllers/assignment.controller')
 const authorizeToken = require('../middlewares/auth')(Assignment)
 
-router.get('/', getAllAssignments)
-router.post('/', createAssignment)
-router.get('/:id', getAssignmentById)
-router.delete('/:id', deleteAssignmentById)
-router.put('/:id', updateAssignmentById)
+router.get('/', authorizeToken, getAllAssignments)
+router.post('/', authorizeToken, createAssignment)
+router.get('/:id',authorizeToken, getAssignmentById)
+router.delete('/:id', authorizeToken, deleteAssignmentById)
+router.put('/:id', authorizeToken, updateAssignmentById)
 
 module.exports = router;

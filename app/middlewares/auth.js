@@ -1,39 +1,41 @@
 const { getUserPasswordAuth, comparePassword } = require('../utils/auth.util')
 
-module.exports = (User) => {
+const db = require('../models/index')
+
+const User = db.users
+
+module.exports = () => {
   const authorizeToken = async (req, res, next) => {
+
     const authHeader = req.headers.authorization
     if (!authHeader) {
       return res.status(401).json({
         message: 'Missing authorization header',
       })
     }
+
     const { username, password } = getUserPasswordAuth(authHeader)
    
     const user = await User.findOne({
       where: {
-        username,
+        email:username,
       },
     })
+
     if (!user) {
       return res.status(401).json({
-        message: 'Unauthorized: Invalid username or password',
+        message: 'Unauthorized: User does not exists',
       })
     }
     const isPasswordMatch = await comparePassword(password, user.password)
     if (!isPasswordMatch) {
       return res.status(401).json({
-        message: 'Unauthorized: Invalid username or password',
-      })
-    }
-
-    if (!user.verified) {
-      return res.status(401).json({
-        message: 'Unauthorized: User is not verified',
+        message: 'Unauthorized: Incorrect password',
       })
     }
     req.user = user
-    global.username = user.username
+
+    global.username = user.email
     next()
   }
 
