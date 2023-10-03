@@ -2,20 +2,22 @@ const express = require('express')
 
 const db = require('../models/index')
 
-const User = db.users
+const Assignment = db.assignment
 
 const router = express.Router()
 const {
-  fetchUserData,
-  createUser,
-  updateUserData,
-  verifyUser,
-} = require('../controllers/user.controller')
-const authorizeToken = require('../middlewares/auth')(User, logger)
+  createAssignment,
+  getAllAssignments,
+  getAssignmentById,
+  deleteAssignmentById,
+  updateAssignmentById,
+} = require('../controllers/assignment.controller')
+const authorizeToken = require('../middlewares/auth')(Assignment)
 
-router.post('/v2/account/', createUser)
-router.get('/v2/account/:id', authorizeToken, fetchUserData)
-router.put('/v2/account/:id', authorizeToken, updateUserData)
-router.get('/v2/verifyUserEmail/', verifyUser)
+router.get('/', getAllAssignments)
+router.post('/', createAssignment)
+router.get('/:id', getAssignmentById)
+router.delete('/:id', deleteAssignmentById)
+router.put('/:id', updateAssignmentById)
 
-module.exports = router
+module.exports = router;
