@@ -14,7 +14,7 @@ db.Sequelize = Sequelize
 db.sequelize = sequelize
 
 db.users = require('./user.model')(sequelize, Sequelize)
-db.document = require('./assignment.model')(sequelize, Sequelize)
+db.assignment = require('./assignment.model')(sequelize, Sequelize)
 
 const csvFilePath = '/opt/users.csv'; // Replace with the path to your CSV file
 
