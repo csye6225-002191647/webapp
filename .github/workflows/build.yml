@@ -1,12 +1,9 @@
 name: CI/CD
 
 on:
-#   pull_request:
-#     types:
-#       - opened
-    push:
-        branches: 
-        - feature_5.0
+  push:
+    branches:
+      - feature_5.0
 
 jobs:
   test:

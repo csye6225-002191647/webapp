@@ -9,11 +9,11 @@ const {
 } = process.env
 
 module.exports = {
-  HOSTNAME: 'localhost',
-  USER: 'jarvis',
-  PASSWORD: 'Rohit@123',
-  PORT: 8080,
-  DB: 'jarvis',
+  HOSTNAME,
+  USER: DBUSER,
+  PASSWORD: DBPASSWORD,
+  PORT,
+  DB: DATABASE,
   dialectOptions: {
     ssl: {
       require: true,
