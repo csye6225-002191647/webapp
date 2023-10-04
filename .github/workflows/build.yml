@@ -16,12 +16,12 @@ jobs:
       - name: 'Create .env file'
         run: |
          touch .env
-         ENVIRONMENT: DEV
-         PORT: 8080
-         DATABASE: jarvis
-         HOSTNAME: localhost
-         DBUSER: jarvis
-         DBPASSWORD=Rohit@123
+         echo ENVIRONMENT: DEV
+         echo PORT: 8080
+         echo DATABASE: jarvis
+         echo HOSTNAME: localhost
+         echo DBUSER: jarvis
+         echo DBPASSWORD=Rohit@123
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2
         with:
