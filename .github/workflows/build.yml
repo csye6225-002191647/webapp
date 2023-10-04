@@ -23,13 +23,15 @@ jobs:
                 echo DBUSER: jarvis
                 echo DBPASSWORD=Rohit@123
         - name: Set up PostgreSQL
-          uses: anothrnick/setup-postgres@v2
-          with:
-            postgres-version: '13'
- 
-        - name: Start PostgreSQL Server
           run: |
-                sudo service postgresql start
+            docker run --name jarvis -e POSTGRES_PASSWORD=Rohit@123 -d -p 5432:5432 postgres:13
+        - name: Wait for PostgreSQL to start
+          run: |
+              for i in {1..30}; do
+                pg_isready -h localhost -p 5432 -U postgres && break
+                sleep 5
+              done
+
         - name: Use Node.js ${{ matrix.node-version }}
           uses: actions/setup-node@v2
           with:
