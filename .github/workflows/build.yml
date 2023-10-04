@@ -1,40 +1,35 @@
 name: CI/CD
 
+env:
+    ENVIRONMENT: test
+
 on:
   push:
-    branches:
-      - feature_5.0
-
+    branches: [feature_5.0]
+       
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres:latest
-        env:
-            ENVIRONMENT: DEV
-            PORT: 8080
-            DATABASE: jarvis
-            HOSTNAME: localhost
-            DBUSER: jarvis
-            DBPASSWORD: Rohit@123
-            # POSTGRES_HOST_AUTH_METHOD: "trust"
-        ports:
-          - 5432:5432
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-
+    strategy:
+        matrix:
+          node-version: [16.x]
+    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Node.js
+      - uses: actions/checkout@v3
+      - name: 'Create .env file'
+        run: |
+         touch .env
+         ENVIRONMENT: DEV
+         PORT: 8080
+         DATABASE: jarvis
+         HOSTNAME: localhost
+         DBUSER: jarvis
+         DBPASSWORD=Rohit@123
+      - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2
         with:
-          node-version: 14
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Run tests
-        run: npm test
+          node-version: ${{ matrix.node-version }}
+      - run: yarn
+      - run: yarn test
+  
+          
