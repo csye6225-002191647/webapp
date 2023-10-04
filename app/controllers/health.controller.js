@@ -10,7 +10,6 @@ exports.checkHealth = async (req, res) => {
         res.set('Cache-control', 'no-cache');
         res.status(200).send();
     } catch (error) {
-        console.log(error);
         res.status(503).send();
     }
 };

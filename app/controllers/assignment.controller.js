@@ -101,7 +101,7 @@ exports.deleteAssignmentById = async(req, res) => {
               });
             });
     } else {
-        res.status(401).send({
+        res.status(403).send({
             message: "You are not authorized to delete this assignment"
         });
     }
@@ -139,7 +139,7 @@ exports.updateAssignmentById = async(req, res) => {
         });
         });
     } else {
-        res.status(401).send({
+        res.status(403).send({
             message: "You are not authorized to update this assignment"
         });
     }
