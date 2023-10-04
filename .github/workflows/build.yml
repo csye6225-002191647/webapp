@@ -12,21 +12,25 @@ jobs:
           node-version: [16.x]
     
     steps:
-      - uses: actions/checkout@v3
-      - name: 'Create .env file'
-        run: |
-         touch .env
-         echo ENVIRONMENT: DEV
-         echo PORT: 8080
-         echo DATABASE: jarvis
-         echo HOSTNAME: localhost
-         echo DBUSER: jarvis
-         echo DBPASSWORD=Rohit@123
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
-        with:
-          node-version: ${{ matrix.node-version }}
-      - run: yarn
-      - run: yarn test
+        - uses: actions/checkout@v3
+        - name: 'Create .env file'
+          run: |
+                touch .env
+                echo ENVIRONMENT: DEV
+                echo PORT: 8080
+                echo DATABASE: jarvis
+                echo HOSTNAME: localhost
+                echo DBUSER: jarvis
+                echo DBPASSWORD=Rohit@123
+ 
+        - name: Start PostgreSQL Server
+          run: |
+                sudo service postgresql start
+        - name: Use Node.js ${{ matrix.node-version }}
+          uses: actions/setup-node@v2
+          with:
+                node-version: ${{ matrix.node-version }}
+        - run: yarn
+        - run: yarn test
   
           
