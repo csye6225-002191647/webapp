@@ -1,6 +1,6 @@
 require('dotenv').config()
 const express = require("express");
-const { ENVIRONMENT, PORT, HOSTNAME } = process.env
+const { ENVIRONMENT, PORT } = process.env
 const app = express();
 const db = require('./app/models')
 
@@ -11,7 +11,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Register routes
-// app.use("/", routes);
 app.use("/healthz",healthRoute);
 app.use("/v1/assignments",assignmentRoutes);
 
@@ -19,19 +18,17 @@ app.use("/v1/assignments",assignmentRoutes);
 app.use((req, res) => {
   if (req.originalUrl !== '/healthz' && req.originalUrl !== '/v1/assignments') {
       res.status(404).send();
-  } else {
+  } else if ((req.originalUrl == '/v1/assignments' && (req.method !== 'GET' || req.method !== 'POST' && req.method !== 'PUT' && req.method !== 'DELETE')) || ( req.originalUrl == '/healthz' && req.method !== 'GET' )){
       res.status(405).send();
   }
 });
 
 if (ENVIRONMENT !== 'TEST') {
   db.connectionTest()
-
   db.syncDB()
 }
 
 // set port, listen for requests
-// const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
