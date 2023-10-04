@@ -1,8 +1,5 @@
 name: CI/CD
 
-env:
-    ENVIRONMENT: DEV
-
 on:
   push:
     branches: [feature_5.0]
