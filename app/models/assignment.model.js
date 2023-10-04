@@ -26,9 +26,17 @@ const Assignment = sequelize.define('Assignment', {
     type: DataTypes.INTEGER,
     allowNull: false,
     validate: {
-      isInt: true,
-      min: 1,
-      max: 10,
+      isInt: {
+        msg: "Points must be an integer.",
+      },
+      min: {
+        args: [1],
+        msg: "Points must be at least 1.",
+      },
+      max: {
+        args: [10],
+        msg: "Points cannot exceed 10.",
+      },
     },
   },
   num_of_attempts: {
