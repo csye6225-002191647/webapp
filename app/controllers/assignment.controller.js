@@ -1,6 +1,7 @@
 const db = require("../models/index");
 const Assignment = db.assignment;
 const User = db.users;
+const l = require("lodash");
 
 // Create and Save a new Assignment
 exports.createAssignment = async (req, res) => {
@@ -11,7 +12,13 @@ exports.createAssignment = async (req, res) => {
     });
     return;
   }
-
+  if(l.isNil(req.body.deadline) || !l.isString(req.body.deadline) || ! /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(req.body.deadline)){
+    res.status(400).send({
+      message: "The deadline is required and should be in the format 16-08-29T09:12:33.001Z"
+    });
+    return;
+ }
+ 
     const { id } = req.user.dataValues
 
   // Create a Assignment
@@ -29,9 +36,9 @@ exports.createAssignment = async (req, res) => {
       res.status(201).send(data);
     })
     .catch(err => {
-      res.status(500).send({
+      res.status(400).send({
         message:
-          err.message || "Some error occurred while creating the Assignment."
+          err.message
       });
     });
 };
@@ -145,4 +152,3 @@ exports.updateAssignmentById = async(req, res) => {
     }
 };
 
-  

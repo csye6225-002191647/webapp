@@ -39,7 +39,12 @@ const Assignment = sequelize.define('Assignment', {
     type: DataTypes.DATE,
     allowNull: false,
     validate: {
-      isDate: true,
+      isAfterNow(value) {
+        // Custom validation function to check if the deadline is greater than the current date
+        if (new Date(value) <= new Date()) {
+          throw new Error('Deadline must be greater than the current date.');
+        }
+      },
     },
   },
   assignment_created: {
