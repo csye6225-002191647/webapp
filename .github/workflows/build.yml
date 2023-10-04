@@ -1,9 +1,9 @@
 name: Integration Tests
 
 on:
-  push:
-    branches: 
-      - feature_5.0 # Assuming your primary branch is named 'main'
+  pull_request:
+    branches:
+      - main # Assuming your primary branch is named 'main'
 
 jobs:
   build-and-test:
