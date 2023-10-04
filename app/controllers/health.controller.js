@@ -9,7 +9,8 @@ exports.checkHealth = async (req, res) => {
         await sequelize.authenticate();
         res.set('Cache-control', 'no-cache');
         res.status(200).send();
-    } catch (error) { 
+    } catch (error) {
+        console.log(error);
         res.status(503).send();
     }
 };
