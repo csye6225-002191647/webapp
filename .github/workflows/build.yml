@@ -1,46 +1,52 @@
-name: CI/CD
+name: Integration Tests
 
 on:
   push:
-    branches: [feature_5.0]
-       
+    branches: 
+      - feature_5.0 # Assuming your primary branch is named 'main'
+
 jobs:
-  test:
+  build-and-test:
     runs-on: ubuntu-latest
-    strategy:
-        matrix:
-          node-version: [16.x]
-    
+
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: jarvis
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_PORT: 5432
+          POSTGRES_HOST: localhost
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
     steps:
-        - uses: actions/checkout@v3
-        - name: 'Create .env file'
-          run: |
-                touch .env
-                echo ENVIRONMENT: DEV
-                echo PORT: 8080
-                echo DATABASE: jarvis
-                echo HOSTNAME: localhost
-                echo DBUSER: jarvis
-                echo DBPASSWORD=jarvis
-                
-        - name: Set up PostgreSQL
-          run: |
-            docker run --name jarvis -e POSTGRES_PASSWORD=jarvis -d -p 5432:5432 postgres:13
-        - name: Wait for PostgreSQL to start
-          run: |
-              for i in {1..30}; do
-                pg_isready -h localhost -p 5432 -U postgres && break
-                sleep 5
-              done
-        - name: Start PostgreSQL Server
-          run: |
-                sudo service postgresql start
-        - name: Use Node.js ${{ matrix.node-version }}
-          uses: actions/setup-node@v2
-          with:
-                node-version: ${{ matrix.node-version }}
-        - run: yarn
-        - run: yarn test
-        
-  
-          
+
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: "Create env file"
+        run: |
+          touch .env
+          echo PGDATABASE=jarvis >> .env
+          echo PGUSER=postgres >> .env
+          echo PGPASSWORD=postgres >> .env
+          echo PGPORT=5432 >> .env
+          echo PGHOST=localhost >> .env
+          echo "cat .env"
+          cat .env
+          echo "ls -a ."
+          ls -a .
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 16.x # Assuming you are using Node.js. Change this accordingly.
+
+      - name: Install Dependencies
+        run: npm install # chekcout to directory, touch a enc file, pull all secrets
+
+      - name: Run Integration Tests
+        run: npm run test:integration # Assuming you have a script in your package.json named "test:integration" that runs your integration tests.
