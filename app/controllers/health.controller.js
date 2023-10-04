@@ -1,4 +1,5 @@
 const sequelize = require("../config/db.config");
+const { setCustomHeaders } = require('../utils/setHeaders');
 
 exports.checkHealth = async (req, res) => {
     var length = req.headers['content-length'];
@@ -7,7 +8,7 @@ exports.checkHealth = async (req, res) => {
     }
     try {
         await sequelize.authenticate();
-        res.set('Cache-control', 'no-cache');
+        setCustomHeaders(res);
         res.status(200).send();
     } catch (error) {
         console.log(error);

@@ -6,7 +6,7 @@ module.exports = () => {
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
-      // primaryKey: true,
+      primaryKey: true,
     },
     first_name: {
       type: DataTypes.STRING,
@@ -30,7 +30,6 @@ module.exports = () => {
     email: {
       type: DataTypes.STRING,
       required: true,
-      primaryKey: true,
       unique: {
         msg: 'Email should be unique',
         fields: ['email'],
