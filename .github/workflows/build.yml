@@ -13,11 +13,11 @@ jobs:
       postgres:
         image: postgres:latest
         env:
-          POSTGRES_DB: jarvis
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_PORT: 5432
-          POSTGRES_HOST: localhost
+          POSTGRES_DB: ${{ secrets.DATABASE }}
+          POSTGRES_USER: ${{ secrets.DBUSER }}
+          POSTGRES_PASSWORD: ${{ secrets.DBPASSWORD }}
+          POSTGRES_PORT: ${{ secrets.PORT }}
+          POSTGRES_HOST: ${{ secrets.HOSTNAME }}
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
@@ -30,15 +30,11 @@ jobs:
       - name: "Create env file"
         run: |
           touch .env
-          echo PGDATABASE=jarvis >> .env
-          echo PGUSER=postgres >> .env
-          echo PGPASSWORD=postgres >> .env
-          echo PGPORT=5432 >> .env
-          echo PGHOST=localhost >> .env
-          echo "cat .env"
-          cat .env
-          echo "ls -a ."
-          ls -a .
+          echo PGDATABASE=${{ secrets.DATABASE }} >> .env
+          echo PGUSER=${{ secrets.DBUSER }} >> .env
+          echo PGPASSWORD=${{ secrets.DBPASSWORD }} >> .env
+          echo PGPORT=${{ secrets.PORT }} >> .env
+          echo PGHOST=${{ secrets.HOSTNAME }} >> .env
 
       - name: Set up Node.js
         uses: actions/setup-node@v2
