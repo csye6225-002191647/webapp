@@ -1,7 +1,7 @@
 name: CI/CD
 
 env:
-    ENVIRONMENT: test
+    ENVIRONMENT: DEV
 
 on:
   push:
