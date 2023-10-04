@@ -6,10 +6,6 @@ const { setCustomHeaders } = require('../utils/setHeaders');
 // Create and Save a new Assignment
 exports.createAssignment = async (req, res) => {
 
-  if(req.url.includes('?')) {
-    return res.status(400).json({ error: 'Invalid url' });
-  }
-
   // Validate request
   const allowedFields = ['name', 'points', 'num_of_attempts', 'deadline'];
   const bodyKeys = Object.keys(req.body);
@@ -61,72 +57,75 @@ exports.createAssignment = async (req, res) => {
 
 // Retrieve all Assignment from the database
 exports.getAllAssignments = (req, res) => {
-  if(req.url.includes('?')) {
-    return res.status(400).json({ error: 'Invalid url' });
+  var length = req.headers['content-length'];
+  if (length > 0) {
+    return res.status(400).json();
   }
-    Assignment.findAll()
-      .then(data => {
-        setCustomHeaders(res);
-        res.status(200).json(data);
-      })
-      .catch(err => {
-        res.status(400).json({
-          message:
-            err.message || "Some error occurred while retrieving assignments."
-        });
+  Assignment.findAll()
+    .then(data => {
+      setCustomHeaders(res);
+      res.status(200).json(data);
+    })
+    .catch(err => {
+      res.status(400).json({
+        message:
+          err.message || "Some error occurred while retrieving assignments."
       });
-  };
+    });
+};
 
 // Retrieve Assignment from the database
 exports.getAssignmentById = (req, res) => {
-  if(req.url.includes('?')) {
-    return res.status(400).json({ error: 'Invalid url' });
+  var length = req.headers['content-length'];
+  if (length > 0) {
+    return res.status(400).json();
   }
-    const id = req.params.id;
   
-    Assignment.findByPk(id)
-      .then(data => {
-        if (data) {
-          setCustomHeaders(res);
-          res.status(200).json(data);
-        } else {
-          res.status(404).json({
-            message: `Cannot find Assignment with id=${id}.`
-          });
-        }
-      })
-      .catch(err => {
-        res.status(400).json({
-          message: "Error retrieving Assignment with id=" + id
+  const id = req.params.id;
+  
+  Assignment.findByPk(id)
+    .then(data => {
+      if (data) {
+        setCustomHeaders(res);
+        res.status(200).json(data);
+      } else {
+        res.status(404).json({
+          message: `Cannot find Assignment with id=${id}.`
         });
+      }
+    })
+    .catch(err => {
+      res.status(400).json({
+        message: "Error retrieving Assignment with id=" + id
       });
-  };
+    });
+};
 
 // Delete Assignment from the database
 exports.deleteAssignmentById = async(req, res) => {
-  if(req.url.includes('?')) {
-    return res.status(400).json({ error: 'Invalid url' });
-  }
-    const id = req.params.id;
-    const {user_id} = await Assignment.findOne({
-        where: { id: id }
-      });
-  
+  try {
+    var length = req.headers['content-length'];
+    if (length > 0) {
+      return res.status(400).json();
+    }
+
+    const requestParamid = req.params.id;
+
+    const { user_id } = await Assignment.findOne({
+      where: { id: requestParamid }
+    });
+
     const user_id_header = req.user.dataValues.id
   
     if(user_id_header === user_id) {
         Assignment.destroy({
-            where: { id: id }
+            where: { id: requestParamid }
           })
             .then(num => {
               if (num == 1) {
                 setCustomHeaders(res);
                 res.status(204).json({
                   message: "Assignment was deleted successfully!"
-                });
-              } else {
-                res.status(404).json({
-                  message: `Cannot delete Assignment with id=${id}. Maybe Assignment was not found!`
                 });
               }
             })
@@ -140,13 +139,16 @@ exports.deleteAssignmentById = async(req, res) => {
             message: "You are not authorized to delete this assignment"
         });
     }
-  };
+  } catch(e) {
+    res.status(404).json({
+      message: "Assignment not found!"
+    });
+  }
+};
 
 // Update Assignment from the database
 exports.updateAssignmentById = async(req, res) => {
-  if(req.url.includes('?')) {
-    return res.status(400).json({ error: 'Invalid url' });
-  }
+  try {
     const id = req.params.id;
 
     const { user_id } = await Assignment.findOne({
@@ -155,11 +157,20 @@ exports.updateAssignmentById = async(req, res) => {
 
     const user_id_header = req.user.dataValues.id
 
+    console.log(user_id, user_id_header)
+
     if(user_id_header === user_id) {
 
-    Assignment.update(req.body, {
-        where: { id: id }
-    })
+      if(req.body.deadline && (l.isNil(req.body.deadline) || !l.isString(req.body.deadline) || ! /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(req.body.deadline))){
+        res.status(400).json({
+          message: "The deadline is required and should be in the format 16-08-29T09:12:33.001Z"
+        });
+        return;
+      }
+
+      Assignment.update(req.body, {
+          where: { id: id }
+      })
         .then(num => {
         if (num == 1) {
             setCustomHeaders(res);
@@ -173,14 +184,20 @@ exports.updateAssignmentById = async(req, res) => {
         }
         })
         .catch(err => {
+          console.log(err);
         res.status(400).json({
-            message: "Error updating Assignment with id=" + id
+            message: err.message
         });
-        });
+      });
     } else {
         res.status(403).json({
             message: "You are not authorized to update this assignment"
         });
     }
+  } catch(e) {
+    res.status(404).json({
+      message: "Assignment does not exists"
+  });
+  }
 };
 
