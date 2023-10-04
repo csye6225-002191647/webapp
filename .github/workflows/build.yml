@@ -49,4 +49,4 @@ jobs:
         run: npm install # chekcout to directory, touch a enc file, pull all secrets
 
       - name: Run Integration Tests
-        run: npm run test:integration # Assuming you have a script in your package.json named "test:integration" that runs your integration tests.
+        run: npm test # Assuming you have a script in your package.json named "test:integration" that runs your integration tests.
