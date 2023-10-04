@@ -21,10 +21,10 @@ jobs:
                 echo DATABASE: jarvis
                 echo HOSTNAME: localhost
                 echo DBUSER: jarvis
-                echo DBPASSWORD=Rohit@123
+                echo DBPASSWORD=jarvis
         - name: Set up PostgreSQL
           run: |
-            docker run --name jarvis -e POSTGRES_PASSWORD=Rohit@123 -d -p 5432:5432 postgres:13
+            docker run --name jarvis -e POSTGRES_PASSWORD=jarvis -d -p 5432:5432 postgres:13
         - name: Wait for PostgreSQL to start
           run: |
               for i in {1..30}; do
