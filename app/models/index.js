@@ -37,7 +37,7 @@ db.connectionTest = async (req, res) => {
 }
 
 db.syncDB = () => { 
-  sequelize.sync({ force: false }).then(async () => {
+  sequelize.sync({ force: true }).then(async () => {
     try {
       for (const csvRow of csvRows) {
         const rowValues = csvRow.split(',');
