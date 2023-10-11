@@ -1,4 +1,4 @@
-## Getting Started
+## Getting Starte
 These instructions will help you set up and deploy the web application locally.
  
 ### Installation
