@@ -42,6 +42,19 @@ const Assignment = sequelize.define('Assignment', {
   num_of_attempts: {
     type: DataTypes.INTEGER,
     allowNull: false,
+    validate: {
+      isInt: {
+        msg: "Number of attempts must be an integer.",
+      },
+      min: {
+        args: [1],
+        msg: "Number of attempts must be at least 1.",
+      },
+      max: {
+        args: [3],
+        msg: "Number of attempts cannot exceed 3.",
+      },
+    },
   },
   deadline: {
     type: DataTypes.DATE,
