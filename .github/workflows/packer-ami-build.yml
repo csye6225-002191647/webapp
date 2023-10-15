@@ -55,7 +55,7 @@ jobs:
           mkdir artifacts
           zip -r artifacts/webapp.zip .
           cd $GITHUB_WORKSPACE
-          cd /home/runner/work/webapp/webapp
+          cd /home/runner/work/webapp/webapp/artifacts
           ls
           pwd
         
