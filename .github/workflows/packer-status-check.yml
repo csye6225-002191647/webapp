@@ -22,7 +22,7 @@ jobs:
 
       - name: Packer fmt Check
         run: |
-          if packer fmt -check .; then
+          if packer fmt -check ./packer-ami; then
             echo "Packer template is formatted correctly."
           else
             echo "Packer template is not formatted correctly. Please format it with 'packer fmt'."
@@ -31,7 +31,7 @@ jobs:
 
       - name: Packer Validate
         run: |
-          if packer validate .; then
+          if packer validate ./packer-ami; then
             echo "Packer template is valid."
           else
             echo "Packer template is not valid. Please fix the issues."
