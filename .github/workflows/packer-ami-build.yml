@@ -1,0 +1,76 @@
+name: Packer AMI Build
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+  push:
+    branches:
+      - main
+
+jobs:
+  build-ami:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: ${{ secrets.DATABASE }}
+          POSTGRES_USER: ${{ secrets.DBUSER }}
+          POSTGRES_PASSWORD: ${{ secrets.DBPASSWORD }}
+          POSTGRES_PORT: ${{ secrets.PORT }}
+          POSTGRES_HOST: ${{ secrets.HOSTNAME }}
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: "Create env file"
+        run: |
+          touch .env
+          echo PGDATABASE=${{ secrets.DATABASE }} >> .env
+          echo PGUSER=${{ secrets.DBUSER }} >> .env
+          echo PGPASSWORD=${{ secrets.DBPASSWORD }} >> .env
+          echo PGPORT=${{ secrets.PORT }} >> .env
+          echo PGHOST=${{ secrets.HOSTNAME }} >> .env
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run integration tests
+        run: npm test
+
+      - name: Build application artifact
+        run: |
+          mkdir artifacts
+          zip -r artifacts/webapp.zip .
+        continue-on-error: true
+
+      - name: Install Packer
+        run: |
+          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+          sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+          sudo apt-get update && sudo apt-get install packer
+
+      - name: Run Packer init
+        run: packer init ./packer-ami
+
+      - name: Build Packer AMI
+        run: packer build ./packer-ami
+
+  protect-ami:
+    runs-on: ubuntu-latest
+    needs: build-ami
+
+    steps:
+      - name: Fail the workflow if any previous job failed
+        run: exit 1

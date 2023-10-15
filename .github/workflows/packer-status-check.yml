@@ -1,0 +1,39 @@
+name: Packer Status Check
+
+on:
+    pull_request:
+      types:
+        - opened
+        - synchronize
+    push:
+      branches:
+        - main
+
+jobs:
+  packer-status-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Run Packer init
+        run: packer init ./packer-ami
+
+      - name: Packer fmt Check
+        run: |
+          if packer fmt -check .; then
+            echo "Packer template is formatted correctly."
+          else
+            echo "Packer template is not formatted correctly. Please format it with 'packer fmt'."
+            exit 1
+          fi
+
+      - name: Packer Validate
+        run: |
+          if packer validate .; then
+            echo "Packer template is valid."
+          else
+            echo "Packer template is not valid. Please fix the issues."
+            exit 1
+          fi
