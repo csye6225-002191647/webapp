@@ -8,7 +8,7 @@ packer {
 }
 
 source "amazon-ebs" "debian" {
-  ami_name      = "debian-12"
+  ami_name      = "debian_12_${formatdate("YYYY_MM_DD_HH_mm_ss", timestamp())}"
   instance_type = "t2.micro"
   ssh_username  = "admin"
   region        = "us-east-1"
@@ -39,6 +39,11 @@ build {
       "sudo -u postgres psql -c \"CREATE DATABASE jarvis;\"",
       "sudo -u postgres psql -c \"GRANT ALL PRIVILEGES ON DATABASE \\\"jarvis\\\" to \\\"jarvis\\\";\"",
     ]
+  }
+  provisioner "file" {
+    direction   = "upload"
+    source      = "./artifacts/webapp.zip"
+    destination = "webapp.zip"
   }
 }
 

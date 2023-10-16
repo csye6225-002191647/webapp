@@ -1,4 +1,4 @@
-name: Packer AMI Build
+name: Packer AMI Build CI
 
 on:
   pull_request:
@@ -53,29 +53,17 @@ jobs:
         run: |
           pwd
           mkdir artifacts
+          echo $GITHUB_WORKSPACE
           zip -r artifacts/webapp.zip .
-          cd $GITHUB_WORKSPACE
-          cd /home/runner/work/webapp/webapp/artifacts
-          ls
-          pwd
-        
 
-  #     - name: Install Packer
-  #       run: |
-  #         curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
-  #         sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-  #         sudo apt-get update && sudo apt-get install packer
+      - name: Install Packer
+        run: |
+          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+          sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+          sudo apt-get update && sudo apt-get install packer
 
-  #     - name: Run Packer init
-  #       run: packer init ./packer-ami
+      - name: Run Packer init
+        run: packer init ./packer-ami
 
-  #     - name: Build Packer AMI
-  #       run: packer build ./packer-ami
-
-  # protect-ami:
-  #   runs-on: ubuntu-latest
-  #   needs: build-ami
-
-  #   steps:
-  #     - name: Fail the workflow if any previous job failed
-  #       run: exit 1
+      - name: Build Packer AMI
+        run: packer build ./packer-ami
