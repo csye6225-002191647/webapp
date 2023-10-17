@@ -1,9 +1,13 @@
-name: Integration Tests
+name: Integration Test
 
 on:
   pull_request:
+    types:
+      - opened
+      - closed
+      - synchronize
     branches:
-      - main # Assuming your primary branch is named 'main'
+      - main
 
 jobs:
   build-and-test:
@@ -39,10 +43,10 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: 16.x # Assuming you are using Node.js. Change this accordingly.
+          node-version: 16.x
 
       - name: Install Dependencies
-        run: npm install # chekcout to directory, touch a enc file, pull all secrets
+        run: npm install
 
       - name: Run Integration Tests
-        run: npm test # Assuming you have a script in your package.json named "test:integration" that runs your integration tests.
+        run: npm test

@@ -7,21 +7,50 @@ packer {
   }
 }
 
+variable "aws_region" {
+  type    = string
+  default = "us-east-1"
+}
+
+variable "source_ami" {
+  type    = string
+  default = "ami-06db4d78cb1d3bbf9"
+}
+
+variable "ssh_username" {
+  type    = string
+  default = "admin"
+}
+
+variable "instance_type" {
+  type    = string
+  default = "t2.micro"
+}
+
+variable "ami_regions" {
+  type    = list(string)
+  default = ["us-east-1"]
+}
+
+variable "ami_users" {
+  type    = list(string)
+  default = ["392319571849", "130565562325"]
+}
+
 source "amazon-ebs" "debian" {
+  profile       = "dev"
   ami_name      = "debian_12_${formatdate("YYYY_MM_DD_HH_mm_ss", timestamp())}"
-  instance_type = "t2.micro"
-  ssh_username  = "admin"
-  region        = "us-east-1"
-  source_ami    = "ami-06db4d78cb1d3bbf9"
-  access_key    = "AKIAVWWARS6ERTE4B7X4"
-  secret_key    = "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"
+  instance_type = "${var.instance_type}"
+  ssh_username  = "${var.ssh_username}"
+  region        = "${var.aws_region}"
+  source_ami    = "${var.source_ami}"
+  ami_users     = "${var.ami_users}"
 }
 
 build {
   sources = [
-    "source.amazon-ebs.debian"
+    "source.amazon-ebs.debian",
   ]
-
   provisioner "shell" {
     inline = [
       "sudo apt-get update",
@@ -46,4 +75,3 @@ build {
     destination = "webapp.zip"
   }
 }
-
