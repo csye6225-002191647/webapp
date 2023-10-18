@@ -16,7 +16,7 @@ db.sequelize = sequelize
 db.users = require('./user.model')(sequelize, Sequelize)
 db.assignment = require('./assignment.model')(sequelize, Sequelize)
 
-const csvFilePath = '/opt/users.csv'; // Replace with the path to your CSV file
+const csvFilePath = '../users.csv'; // Replace with the path to your CSV file
 
 // Read the CSV file
 const csvData = fs.readFileSync(path.resolve(__dirname, csvFilePath), 'utf8');
@@ -30,9 +30,9 @@ const columnNames = csvRows.shift().split(',');
 db.connectionTest = async (req, res) => {
   try {
     await sequelize.authenticate()
-    console.log(`Successfully connected to database "${dbConfig.DB}"`)
+    console.log(`Successfully connected to database`)
   } catch (error) {
-    console.log(`Unable to connect to the database "${dbConfig.DB}":`, error)
+    console.log(`Unable to connect to the database`, error)
   }
 }
 

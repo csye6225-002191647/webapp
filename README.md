@@ -1,5 +1,6 @@
 ## Getting Started
-These instructions will help you set up and deploy the web application locally. hello
+These instructions will help you set up and deploy the web application locally.
+
  
 ### Installation
 - Clone the organization repo using: git clone PATH
