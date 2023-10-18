@@ -35,5 +35,6 @@ sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE "jarvis" to jarvis;"
 sudo apt install unzip
 unzip webapp
 rm -rf webapp.zip
+sudo apt-get remove -y git
 cd webapp
 npm install
