@@ -16,7 +16,7 @@ db.sequelize = sequelize
 db.users = require('./user.model')(sequelize, Sequelize)
 db.assignment = require('./assignment.model')(sequelize, Sequelize)
 
-const csvFilePath = '/opt/users.csv'; // Replace with the path to your CSV file
+const csvFilePath = '../users.csv'; // Replace with the path to your CSV file // Replace with the path to your CSV file
 
 // Read the CSV file
 const csvData = fs.readFileSync(path.resolve(__dirname, csvFilePath), 'utf8');

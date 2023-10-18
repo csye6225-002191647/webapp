@@ -4,7 +4,6 @@ on:
   pull_request:
     types:
       - opened
-      - closed
       - synchronize
     branches:
       - main
@@ -20,7 +19,8 @@ jobs:
           POSTGRES_DB: ${{ secrets.DATABASE }}
           POSTGRES_USER: ${{ secrets.DBUSER }}
           POSTGRES_PASSWORD: ${{ secrets.DBPASSWORD }}
-          POSTGRES_PORT: ${{ secrets.PORT }}
+          POSTGRES_PORT: ${{ secrets.DBPORT }}
+          PORT: ${{ secrets.PORT }}
           POSTGRES_HOST: ${{ secrets.HOSTNAME }}
         ports:
           - 5432:5432
@@ -37,7 +37,8 @@ jobs:
           echo PGDATABASE=${{ secrets.DATABASE }} >> .env
           echo PGUSER=${{ secrets.DBUSER }} >> .env
           echo PGPASSWORD=${{ secrets.DBPASSWORD }} >> .env
-          echo PGPORT=${{ secrets.PORT }} >> .env
+          echo POSTGRES_PORT=${{ secrets.DBPORT }} >> .env
+          echo PORT=${{ secrets.PORT }} >> .env
           echo PGHOST=${{ secrets.HOSTNAME }} >> .env
 
       - name: Set up Node.js
