@@ -37,7 +37,7 @@ source "amazon-ebs" "debian" {
   ami_name      = "debian_12_${formatdate("YYYY_MM_DD_HH_mm_ss", timestamp())}"
   instance_type = "${var.instance_type}"
   ssh_username  = "${var.ssh_username}"
-  
+
   source_ami_filter {
     owners      = ["amazon"]
     most_recent = true
