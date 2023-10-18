@@ -27,11 +27,6 @@ variable "instance_type" {
   default = "t2.micro"
 }
 
-variable "ami_regions" {
-  type    = list(string)
-  default = ["us-east-1"]
-}
-
 variable "ami_users" {
   type    = list(string)
   default = ["392319571849", "130565562325"]
@@ -42,7 +37,6 @@ source "amazon-ebs" "debian" {
   ami_name      = "debian_12_${formatdate("YYYY_MM_DD_HH_mm_ss", timestamp())}"
   instance_type = "${var.instance_type}"
   ssh_username  = "${var.ssh_username}"
-  region        = "${var.aws_region}"
   
   source_ami_filter {
     owners      = ["amazon"]
