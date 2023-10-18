@@ -30,9 +30,9 @@ const columnNames = csvRows.shift().split(',');
 db.connectionTest = async (req, res) => {
   try {
     await sequelize.authenticate()
-    console.log(`Successfully connected to database "${dbConfig.DB}"`)
+    console.log(`Successfully connected to database`)
   } catch (error) {
-    console.log(`Unable to connect to the database "${dbConfig.DB}":`, error)
+    console.log(`Unable to connect to the database`, error)
   }
 }
 
