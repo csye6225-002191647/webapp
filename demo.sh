@@ -1,19 +1,5 @@
 #!/bin/bash
 
-
-# Create the "env" file and set environment variables
-cat <<EOL > .env
-export PGDATABASE=postgres
-export PGUSER=postgres
-export PGPASSWORD=postgres
-export PGPORT=5432
-export PORT=3000
-export PGHOST=localhost
-EOL
-
-# Source the "env" file to load the environment variables
-source .env
-
 echo $PGDATABASE
 echo $PGUSER
 echo $PGPASSWORD

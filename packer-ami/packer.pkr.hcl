@@ -7,16 +7,6 @@ packer {
   }
 }
 
-variable "aws_region" {
-  type    = string
-  default = "us-east-1"
-}
-
-variable "source_ami" {
-  type    = string
-  default = "ami-06db4d78cb1d3bbf9"
-}
-
 variable "ssh_username" {
   type    = string
   default = "admin"
