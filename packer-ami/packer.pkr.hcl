@@ -43,35 +43,38 @@ source "amazon-ebs" "debian" {
   instance_type = "${var.instance_type}"
   ssh_username  = "${var.ssh_username}"
   region        = "${var.aws_region}"
-  source_ami    = "${var.source_ami}"
-  ami_users     = "${var.ami_users}"
+  
+  source_ami_filter {
+    owners      = ["amazon"]
+    most_recent = true
+    filters = {
+      virtualization-type = "hvm"
+      name                = "debian-12-amd64-*"
+      root-device-type    = "ebs"
+    }
+  }
+  ami_users = "${var.ami_users}"
 }
 
 build {
   sources = [
     "source.amazon-ebs.debian",
   ]
-  provisioner "shell" {
-    inline = [
-      "sudo apt-get update",
-      "sudo apt update",
-      "sudo apt upgrade -y",
-      "export PGDATABASE=postgres PGUSER=postgres PGPASSWORD=postgres PGPORT=5432 PGHOST=localhost",
-      "sudo apt install -y postgresql postgresql-contrib",
-      "sudo systemctl start postgresql",
-      "sudo systemctl enable postgresql",
-      "sudo apt install -y nodejs",
-      "sudo apt install -y npm",
-      "nodejs -v",
-      "sudo -u postgres psql -c \"ALTER USER postgres WITH PASSWORD 'postgres';\"",
-      "sudo -u postgres psql -c \"CREATE USER jarvis WITH PASSWORD 'postgres';\"",
-      "sudo -u postgres psql -c \"CREATE DATABASE jarvis;\"",
-      "sudo -u postgres psql -c \"GRANT ALL PRIVILEGES ON DATABASE \\\"jarvis\\\" to \\\"jarvis\\\";\"",
-    ]
-  }
   provisioner "file" {
     direction   = "upload"
     source      = "./artifacts/webapp.zip"
     destination = "webapp.zip"
+  }
+  provisioner "file" {
+    source      = "demo.sh"
+    destination = "~/"
+  }
+  provisioner "shell" {
+    inline = [
+      "pwd",
+      "ls -a -l",
+      "sudo bash ~/demo.sh",
+
+    ]
   }
 }
