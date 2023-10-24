@@ -7,7 +7,7 @@ packer {
   }
 }
 
-variable "ssh_username" {
+    variable "ssh_username" {
   type    = string
   default = "admin"
 }
