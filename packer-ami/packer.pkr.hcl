@@ -10,7 +10,7 @@ packer {
 variable "ssh_username" {
   type    = string
   default = "admin"
-}
+
 
 variable "instance_type" {
   type    = string
