@@ -47,7 +47,7 @@ build {
   provisioner "file" {
     direction   = "upload"
     source      = "./artifacts/webapp.zip"
-    destination = "webapp.zip"
+    destination = "/tmp/webapp.zip"
   }
   provisioner "file" {
     source      = "demo.sh"
