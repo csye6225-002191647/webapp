@@ -10,10 +10,18 @@ const assignmentRoutes = require("./app/routes/assignment.route");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.get('/', function(req,res){
-  res.writeHead(200, {"Content-Type": "text/plain"});
-  res.send("Hello World!")
-})
+// default route 
+app.get('/', function(req, res){
+  res.writeHead(200, { "Content-Type": "text/plain" });
+  res.end("Hello World\n");
+});
+
+app.use('/v1/assignments/:id', (req, res, next) => {
+  if (req.method === 'PATCH') {
+    res.status(405).json();
+  }
+  next();
+});
 
 // Register routes
 app.use("/healthz",healthRoute);

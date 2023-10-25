@@ -1,16 +1,18 @@
 const {Sequelize} = require('sequelize');
 const dbConfig = require('../config/app.config')
 
-const sequelize = new Sequelize({
+const sequelizeParameters = {
   host: dbConfig.HOST,
   username: dbConfig.USER,
-  password: dbConfig.PASSWORD,
   database: dbConfig.DB,
-  dialect: "postgres",
-  // dialectOptions: dbConfig.dialectOptions,
-  port: 5432
-});
+  dialect: dbConfig.DIALECT,
+  port: dbConfig.DBPORT,
+  password: dbConfig.PASSWORD
+}
+
+if (dbConfig.HOST && dbConfig.HOST.includes('.rds.amazonaws.com')) {
+  sequelizeParameters.dialectOptions = dbConfig.dialectOptions
+}
+const sequelize = new Sequelize(sequelizeParameters)
 
 module.exports = sequelize;
-
-
