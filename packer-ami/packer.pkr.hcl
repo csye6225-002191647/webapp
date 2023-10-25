@@ -22,19 +22,43 @@ variable "ami_users" {
   default = ["392319571849", "130565562325"]
 }
 
+variable "profile" {
+  type    = string
+  default = "dev"
+}
+
+variable "owners" {
+  type    = list(string)
+  default = ["amazon"]
+}
+
+variable "source_ami_filter_virtualization_type" {
+  type    = string
+  default = "hvm"
+}
+
+variable "source_ami_filter_name" {
+  type    = string
+  default = "debian-12-amd64-*"
+}
+
+variable "source_ami_filter_root_device_type" {
+  type    = string
+  default = "ebs"
+}
+
 source "amazon-ebs" "debian" {
-  profile       = "dev"
+  profile       = "${var.profile}"
   ami_name      = "debian_12_${formatdate("YYYY_MM_DD_HH_mm_ss", timestamp())}"
   instance_type = "${var.instance_type}"
   ssh_username  = "${var.ssh_username}"
-
   source_ami_filter {
-    owners      = ["amazon"]
+    owners      = "${var.owners}"
     most_recent = true
     filters = {
-      virtualization-type = "hvm"
-      name                = "debian-12-amd64-*"
-      root-device-type    = "ebs"
+      virtualization-type = "${var.source_ami_filter_virtualization_type}"
+      name                = "${var.source_ami_filter_name}"
+      root-device-type    = "${var.source_ami_filter_root_device_type}"
     }
   }
   ami_users = "${var.ami_users}"
@@ -58,7 +82,6 @@ build {
       "pwd",
       "ls -a -l",
       "sudo bash ~/demo.sh",
-
     ]
   }
 }

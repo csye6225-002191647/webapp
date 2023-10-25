@@ -5,7 +5,9 @@ const {
   DBUSER,
   DBPASSWORD,
   PORT,
-  DATABASE
+  DATABASE,
+  DBPORT
+
 } = process.env;
 
 module.exports = {
@@ -14,6 +16,8 @@ module.exports = {
   PASSWORD: DBPASSWORD,
   PORT,
   DB: DATABASE,
+  DBPORT,
+  DIALECT: "postgres",
   dialectOptions: {
     ssl: {
       require: true,
