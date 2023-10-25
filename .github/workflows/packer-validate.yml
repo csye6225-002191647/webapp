@@ -32,12 +32,9 @@ jobs:
 
     - name: Run Packer fmt
       run: |
-        if git diff --name-only ${{ github.base_ref }} | grep -q '.pkr.hcl$'; then
-          packer fmt -check ./packer-ami
-          if [ $? -ne 0 ]; then
-            echo "Packer HCL template formatting is incorrect. Please run 'packer fmt' and push the changes."
-            exit 1
-          fi
+        if ! packer fmt -check ./packer-ami; then
+          echo "Packer HCL template formatting is incorrect. Please run 'packer fmt' and push the changes."
+          exit 1
         fi
 
     - name: Run Packer validate

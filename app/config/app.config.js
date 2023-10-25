@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('dotenv').config();
 
 const {
   HOSTNAME,
@@ -6,10 +6,10 @@ const {
   DBPASSWORD,
   PORT,
   DATABASE
-} = process.env
+} = process.env;
 
 module.exports = {
-  HOSTNAME,
+  HOST: HOSTNAME,
   USER: DBUSER,
   PASSWORD: DBPASSWORD,
   PORT,
@@ -20,4 +20,4 @@ module.exports = {
       rejectUnauthorized: false,
     },
   },
-}
+};
