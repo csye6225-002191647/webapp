@@ -48,4 +48,4 @@ jobs:
         run: packer init ./packer-ami
 
       - name: Build Packer AMI
-        run: packer build --var-file=./packer-ami/variables.pkrvars.hcl ./packer-ami/test.pkr.hcl
+        run: packer build --var-file=./packer-ami/variables.pkrvars.hcl ./packer-ami/packer.pkr.hcl
