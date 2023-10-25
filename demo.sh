@@ -57,6 +57,8 @@ sudo cp ./service/node.service /etc/systemd/system/node.service
 sudo systemctl daemon-reload
 sudo systemctl enable node.service
 sudo systemctl start node.service
+sudo systemctl restart node.service
+# sudo systemctl stop node.service
 journalctl -u node.service -b
 
 # Remove git files
