@@ -143,3 +143,42 @@ Please make sure to modify your Pulumi scripts to meet these requirements for yo
 ```
 
 The updated README.md now includes the additional assignment requirements related to SSH access, testing APIs, pre-installed dependencies, and database and Git configuration. Make sure to adjust your Pulumi scripts accordingly to meet these requirements.
+
+Assignment - 06 
+
+# Web Application Readme
+
+This readme offers a comprehensive guide for setting up and configuring the web application. Please adhere to the instructions below to ensure a seamless deployment and implementation of the application.
+
+## Prerequisites
+
+1. An AWS account with the required permissions for creating EC2 instances, RDS instances, and other essential resources.
+2. Pulumi CLI installation with appropriate credentials configured.
+3. Familiarity with Systemd or equivalent tools for setting up automatic execution.
+4. Understanding of managing cloud-init processes and userdata scripts on AWS.
+
+## Setup Instructions
+
+### 1. Launching the EC2 Instance and RDS
+
+- Execute Pulumi with the provided codebase to initiate the EC2 instance and RDS. Ensure that the web application uses the RDS instance created during this process.
+- Be sure to set up the correct security groups and network configurations for the EC2 and RDS instances to facilitate communication.
+
+### 2. Configuring Autorun Using Systemd
+
+- Employ Systemd or an alternative of your choice to set up autorun for the web application.
+- To ensure that the service initiates after the completion of cloud-init, designate it as required or wanted by cloud-init, rather than the typical multi-user. For additional guidance, refer to [this link](https://serverfault.com/a/937723).
+
+### 3. Setting Up Integration Tests
+
+- For integration tests within your GitHub Actions, configure a local database on the EC2 instance for testing purposes.
+- Arrange the necessary scripts and environments in your GitHub Actions workflow to ensure seamless integration testing.
+
+## Additional Notes
+
+- Regularly monitor application logs and AWS resources to maintain smooth functionality and performance.
+- Document any changes made to the setup or configuration for future reference.
+- Adhere to security best practices and ensure secure storage and access of sensitive information.
+
+---
+By following these guidelines, you can successfully establish and manage the web application, including the required autorun and integration testing configurations.
