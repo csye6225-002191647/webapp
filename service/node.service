@@ -9,7 +9,9 @@ Type=simple
 User=csye6225
 Group=csye6225
 ExecStart=/usr/bin/node /opt/csye6225/webapp/app.js
-Restart=on-failure always
+Restart=always
+RestartSec=10
+
 WorkingDirectory=/opt/csye6225/webapp
 
 [Install]
