@@ -51,6 +51,9 @@ sudo rm -rf /opt/csye6225/webapp/artifacts
 cd /opt/csye6225/webapp
 sudo npm install
 
+sudo chmod 700 /opt/csye6225/
+sudo -u csye6225 bash
+
 # Setting up systemd
 sudo touch /opt/csye6225/webapp/.env
 sudo cp ./service/node.service /etc/systemd/system/node.service
