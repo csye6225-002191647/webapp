@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config()
 
 const {
   HOSTNAME,
@@ -7,21 +7,20 @@ const {
   PORT,
   DATABASE,
   DBPORT
-
-} = process.env;
+} = process.env
 
 module.exports = {
   HOST: HOSTNAME,
   USER: DBUSER,
   PASSWORD: DBPASSWORD,
-  PORT,
+  PORT: PORT,
   DB: DATABASE,
-  DBPORT,
-  DIALECT: "postgres",
   dialectOptions: {
     ssl: {
       require: true,
-      rejectUnauthorized: false,
-    },
+      rejectUnauthorized: false
+    }
   },
-};
+  DIALECT: 'postgres',
+  DBPORT: DBPORT
+}
