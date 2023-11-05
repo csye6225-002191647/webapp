@@ -10,6 +10,12 @@ const assignmentRoutes = require("./app/routes/assignment.route");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use((err, req, res, next) => {
+  if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+    res.status(400).json();
+  }
+});
+
 // default route 
 app.get('/', function(req, res){
   res.writeHead(200, { "Content-Type": "text/plain" });
