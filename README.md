@@ -1,7 +1,7 @@
 demo
 The provided README.md file offers a good starting point for managing your Infrastructure as Code (IaC) using Pulumi to create and manage AWS networking resources. However, there are some specific requirements for your assignment that are not covered in the README. Let's modify the README.md to include those additional requirements:
 
-```markdown
+```markdown.
 # iac-pulumi
 
 This GitHub repository is set up to manage the Infrastructure as Code (IaC) using Pulumi for creating and managing AWS networking resources. The infrastructure setup includes creating Virtual Private Cloud (VPC), subnets, route tables, and an Internet Gateway. This repository is intended for use in your AWS environment, allowing you to create multiple VPCs with varying configurations using Pulumi stacks.
