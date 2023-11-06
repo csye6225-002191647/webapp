@@ -4,7 +4,7 @@ const l = require("lodash");
 const { setCustomHeaders } = require('../utils/setHeaders');
 const logger = require('../config/logger.config');
 const statsd = require('node-statsd')
-const appConfig = require('../configs/app.config')
+const appConfig = require('../config/app.config')
 
 const client = new statsd({
     host: appConfig.METRICS_HOSTNAME,
