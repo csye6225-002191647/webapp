@@ -20,7 +20,7 @@ sudo apt upgrade -y
 
 # Install PostgreSQL and related packages
 # sudo apt install -y postgresql postgresql-contrib
-sudo apt-get install postgresql-client
+sudo apt-get install -y postgresql-client
 
 # Start and enable PostgreSQL service
 # sudo systemctl start postgresql
@@ -55,6 +55,14 @@ sudo npm install
 sudo chown -R csye6225:csye6225 /opt/csye6225/webapp
 sudo chmod -R 700 /opt/csye6225/webapp
 # sudo -u csye6225 bash
+
+# sudo yum install -y awslogs
+# sudo systemctl start awslogsd
+# sudo systemctl enable awslogsd.service
+
+sudo yum install amazon-cloudwatch-agent -y
+sudo systemctl start amazon-cloudwatch-agent
+sudo systemctl enable amazon-cloudwatch-agent
 
 # Setting up systemd
 # sudo touch /opt/csye6225/webapp/.env
