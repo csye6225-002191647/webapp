@@ -24,7 +24,8 @@ jobs:
           echo PGPASSWORD=${{ secrets.DBPASSWORD }} >> .env
           echo POSTGRES_PORT=${{ secrets.DBPORT }} >> .env
           echo PORT=${{ secrets.PORT }} >> .env
-          echo PGHOST=${{ secrets.HOSTNAME }} >> .env  
+          echo PGHOST=${{ secrets.HOSTNAME }} >> .env
+          echo ENVIRONMENT=${{ secrets.ENVIRONMENT }} >> .env
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
