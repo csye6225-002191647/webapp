@@ -22,5 +22,8 @@ module.exports = {
     }
   },
   DIALECT: 'postgres',
-  DBPORT: DBPORT
+  DBPORT: DBPORT,
+  METRICS_HOSTNAME: 'localhost',
+  METRICS_PORT: 8125,
+  METRICS_PREFIX: 'CSYE_6225'
 }
