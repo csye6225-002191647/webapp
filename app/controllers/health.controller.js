@@ -13,15 +13,16 @@ const client = new statsd({
 exports.checkHealth = async (req, res) => {
 client.increment('endpoint.health')
   var length = req.headers["content-length"];
-  if ((req.method == "GET" && length > 0) || req.url.includes("?")) {
-    logger.error("Health check failed due to invalid request");
-    return res.status(400).send();
-  }
   try {
+    if ((req.method == "GET" && length > 0) || req.url.includes("?")) {
+      logger.error("Health check failed due to invalid request");
+      res.status(400).send();
+    }else{
       await sequelize.authenticate();
       setCustomHeaders(res);
       res.status(200).send();
       logger.info("Health check passed");
+    }
   } catch (error) {
     res.status(503).send();
     logger.fatal("Service unavailable");
