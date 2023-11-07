@@ -1,30 +1,11 @@
 #!/bin/bash
 
-# export PGDATABASE=postgres
-# export PGUSER=postgres 
-# export PGPASSWORD=postgres 
-# export PGPORT=5432 
-# export PORT=3000
-# export PGHOST=localhost
-
-# echo $PGDATABASE
-# echo $PGUSER
-# echo $PGPASSWORD
-# echo $PGPORT
-# echo $PGHOST
-# echo $PORT
-
 # Update and upgrade packages
 sudo apt update
 sudo apt upgrade -y
 
 # Install PostgreSQL and related packages
-# sudo apt install -y postgresql postgresql-contrib
 sudo apt-get install -y postgresql-client
-
-# Start and enable PostgreSQL service
-# sudo systemctl start postgresql
-# sudo systemctl enable postgresql
 
 # Install Node.js and npm
 sudo apt install -y nodejs
@@ -44,6 +25,14 @@ sudo mv /tmp/webapp.zip /opt/csye6225/
 sudo unzip /opt/csye6225/webapp.zip -d /opt/csye6225/webapp
 sudo rm -rf /opt/csye6225/webapp.zip
 
+#install cloud watch
+echo 'Downloading the CloudWatch Agent package...'
+sudo wget https://s3.amazonaws.com/amazoncloudwatch-agent/debian/amd64/latest/amazon-cloudwatch-agent.deb
+echo 'Installing the CloudWatch Agent package...'
+sudo dpkg -i -E ./amazon-cloudwatch-agent.deb
+echo 'Enabling the CloudWatch Agent service...'
+sudo rm ./amazon-cloudwatch-agent.deb
+
 #remove artifacts
 sudo rm -rf /opt/csye6225/webapp/artifacts
 
@@ -56,14 +45,6 @@ sudo chown -R csye6225:csye6225 /opt/csye6225/webapp
 sudo chmod -R 700 /opt/csye6225/webapp
 # sudo -u csye6225 bash
 
-# sudo yum install -y awslogs
-# sudo systemctl start awslogsd
-# sudo systemctl enable awslogsd.service
-
-sudo yum install amazon-cloudwatch-agent -y
-sudo systemctl start amazon-cloudwatch-agent
-sudo systemctl enable amazon-cloudwatch-agent
-
 # Setting up systemd
 # sudo touch /opt/csye6225/webapp/.env
 sudo cp ./service/node.service /etc/systemd/system/node.service
@@ -73,6 +54,9 @@ sudo systemctl start node.service
 sudo systemctl restart node.service
 # sudo systemctl stop node.service
 journalctl -u node.service -b
+
+sudo systemctl enable amazon-cloudwatch-agent
+sudo systemctl start amazon-cloudwatch-agent
 
 # Remove git files
 sudo apt-get remove -y git
