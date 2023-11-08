@@ -2,12 +2,42 @@ const { getUserPasswordAuth, comparePassword } = require('../utils/auth.util')
 const sequelize = require("../config/db.config");
 const logger = require('../config/logger.config')
 const db = require('../models/index')
+const statsd = require('node-statsd')
+const appConfig = require('../config/app.config')
+
+const client = new statsd({
+    host: appConfig.METRICS_HOSTNAME,
+    port: appConfig.METRICS_PORT,
+    prefix: appConfig.METRICS_PREFIX
+  })
+
 
 const User = db.users
 
 module.exports = () => {
   const authorizeToken = async (req, res, next) => {
 
+    switch (req.method) {
+      case 'POST':
+        client.increment('endpoint.create.assignment');
+        break;
+      case 'GET':
+        // Check if it's a single assignment or all assignments
+        if (req.params.id) {
+          // GET by id
+          client.increment('endpoint.get.assignment');
+        } else {
+          // GetAll assignments
+          client.increment('endpoint.get.assignments');
+        }
+        break;
+      case 'PUT':
+        client.increment('endpoint.update.assignment');
+        break;
+      case 'DELETE':
+        client.increment('endpoint.delete.assignment');
+    }
+    
     try {
       await sequelize.authenticate();
       logger.info('Database successfully authenticated')

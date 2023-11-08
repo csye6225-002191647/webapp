@@ -3,19 +3,10 @@ const Assignment = db.assignment;
 const l = require("lodash");
 const { setCustomHeaders } = require('../utils/setHeaders');
 const logger = require('../config/logger.config');
-const statsd = require('node-statsd')
-const appConfig = require('../config/app.config')
-
-const client = new statsd({
-    host: appConfig.METRICS_HOSTNAME,
-    port: appConfig.METRICS_PORT,
-    prefix: appConfig.METRICS_PREFIX
-  })
 
 // Create and Save a new Assignment
 exports.createAssignment = async (req, res) => {
   // Validate request
-  client.increment('endpoint.create.assignemnt')
   logger.info('Creating a new Assignment');
   const allowedFields = ['name', 'points', 'num_of_attempts', 'deadline'];
   const bodyKeys = Object.keys(req.body);
@@ -82,7 +73,6 @@ exports.createAssignment = async (req, res) => {
 
 // Retrieve all Assignment from the database
 exports.getAllAssignments = (req, res) => {
-  client.increment('endpoint.get.assignments')
   logger.info('Retrieving all Assignments');
   var length = req.headers['content-length'];
   if (length > 0) {
@@ -113,7 +103,6 @@ exports.getAllAssignments = (req, res) => {
 
 // Retrieve Assignment from the database
 exports.getAssignmentById = (req, res) => {
-  client.increment('endpoint.get.assignment')
   logger.info('Retrieving Assignment by ID');
   var length = req.headers['content-length'];
   if (length > 0) {
@@ -155,7 +144,6 @@ exports.getAssignmentById = (req, res) => {
 
 // Delete Assignment from the database
 exports.deleteAssignmentById = async(req, res) => {
-  client.increment('endpoint.delete.assignment')
   logger.info('Deleting Assignment by ID');
   try {
     var length = req.headers['content-length'];
@@ -207,7 +195,6 @@ exports.deleteAssignmentById = async(req, res) => {
 
 // Update Assignment from the database
 exports.updateAssignmentById = async (req, res) => {
-  client.increment('endpoint.update.assignment')
   logger.info('Updating Assignment by ID');
   try {
     const id = req.params.id;
