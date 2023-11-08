@@ -8,10 +8,10 @@ const client = new statsd({
     host: appConfig.METRICS_HOSTNAME,
     port: appConfig.METRICS_PORT,
     prefix: appConfig.METRICS_PREFIX
-  })
+})
 
 exports.checkHealth = async (req, res) => {
-client.increment('endpoint.health')
+  client.increment('endpoint.health')
   var length = req.headers["content-length"];
   try {
     if ((req.method == "GET" && length > 0) || req.url.includes("?")) {
@@ -26,5 +26,7 @@ client.increment('endpoint.health')
   } catch (error) {
     res.status(503).send();
     logger.fatal("Service unavailable");
+  } finally {
+    client.socket.close();
   }
 };

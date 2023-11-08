@@ -1,5 +1,6 @@
 const { getUserPasswordAuth, comparePassword } = require('../utils/auth.util')
 const sequelize = require("../config/db.config");
+const logger = require('../config/logger.config')
 const db = require('../models/index')
 
 const User = db.users
@@ -9,16 +10,20 @@ module.exports = () => {
 
     try {
       await sequelize.authenticate();
-    } catch (error) { 
+      logger.info('Database successfully authenticated')
+    } catch (error) {
+      logger.fatal('Error authenticating database')
       return res.status(503).send();
     }
 
     if(req.url.includes('?')) {
+      logger.error('Query parameters not allowed')
       return res.status(400).json({ error: 'Invalid url' });
     }
 
     const authHeader = req.headers.authorization
     if (!authHeader) {
+      logger.error('Missing authorization header')
       return res.status(401).json({
         message: 'Missing authorization header',
       })
@@ -39,6 +44,7 @@ module.exports = () => {
     }
     const isPasswordMatch = await comparePassword(password, user.password)
     if (!isPasswordMatch) {
+      logger.error('User does not exists')
       return res.status(401).json({
         message: 'Unauthorized: Incorrect password',
       })
@@ -48,6 +54,6 @@ module.exports = () => {
     global.username = user.email
     next()
   }
-
+  logger.info('User successfully authenticated')
   return authorizeToken
 }
