@@ -4,13 +4,14 @@ const logger = require("../config/logger.config");
 const statsd = require('node-statsd')
 const appConfig = require('../config/app.config')
 
-const client = new statsd({
+exports.checkHealth = async (req, res) => {
+  
+  const client = new statsd({
     host: appConfig.METRICS_HOSTNAME,
     port: appConfig.METRICS_PORT,
     prefix: appConfig.METRICS_PREFIX
 })
 
-exports.checkHealth = async (req, res) => {
   client.increment('endpoint.health')
   var length = req.headers["content-length"];
   try {
@@ -27,6 +28,6 @@ exports.checkHealth = async (req, res) => {
     res.status(503).send();
     logger.fatal("Service unavailable");
   } finally {
-    client.socket.close();
+    client.close();
   }
 };
