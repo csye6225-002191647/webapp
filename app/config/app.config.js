@@ -25,5 +25,5 @@ module.exports = {
   DBPORT: DBPORT,
   METRICS_HOSTNAME: 'localhost',
   METRICS_PORT: 8125,
-  METRICS_PREFIX: 'CSYE_6225'
+  METRICS_PREFIX: 'csye6225_'
 }
