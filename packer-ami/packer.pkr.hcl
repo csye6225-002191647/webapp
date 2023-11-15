@@ -76,7 +76,7 @@ build {
   provisioner "file" {
     direction   = "upload"
     source      = "./app/config/cloudwatch.config.json"
-    destination = "/tmp/cloudwatch.config.json
+    destination = "/tmp/cloudwatch.config.json"
   }
   provisioner "file" {
     source      = "demo.sh"
