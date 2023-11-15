@@ -74,6 +74,16 @@ build {
     destination = "/tmp/webapp.zip"
   }
   provisioner "file" {
+    direction   = "upload"
+    source      = "../logs/webapp.log"
+    destination = "/opt/csye6225/webapp/logs"
+  }
+  provisioner "file" {
+    direction   = "upload"
+    source      = "../logs/webapp.log"
+    destination = "/var/logs"
+  }
+  provisioner "file" {
     source      = "demo.sh"
     destination = "~/"
   }
