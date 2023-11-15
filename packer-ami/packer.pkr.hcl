@@ -95,4 +95,3 @@ build {
       "sudo bash ~/demo.sh",
     ]
   }
-}
