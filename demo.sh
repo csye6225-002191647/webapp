@@ -25,6 +25,8 @@ sudo mv /tmp/webapp.zip /opt/csye6225/
 sudo unzip /opt/csye6225/webapp.zip -d /opt/csye6225/webapp
 sudo rm -rf /opt/csye6225/webapp.zip
 
+sudo mv /tmp/cloudwatch.config.json /opt/csye6225/webapp
+
 #install cloud watch
 echo 'Downloading the CloudWatch Agent package...'
 sudo wget https://s3.amazonaws.com/amazoncloudwatch-agent/debian/amd64/latest/amazon-cloudwatch-agent.deb
