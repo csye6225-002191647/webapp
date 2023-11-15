@@ -75,13 +75,14 @@ build {
   }
   provisioner "file" {
     direction   = "upload"
-    source      = "./artifacts/webapp/logs/webapp.log"
+    source      = "/webapp/logs/webapp.log"
     destination = "/opt/csye6225/webapp/logs"
   }
   provisioner "file" {
     direction   = "upload"
-    source      = "./artifacts/webapp/logs/webapp.log"
+    source      = "/webapp/logs/webapp.log"
     destination = "/var/logs"
+  }
   }
   provisioner "file" {
     source      = "demo.sh"
