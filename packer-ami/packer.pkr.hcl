@@ -75,13 +75,8 @@ build {
   }
   provisioner "file" {
     direction   = "upload"
-    source      = "/webapp//logs/webapp.log"
-    destination = "/opt/csye6225/webapp/logs"
-  }
-  provisioner "file" {
-    direction   = "upload"
-    source      = "/webapp/logs/webapp.log"
-    destination = "/var/logs"
+    source      = "./app/config/cloudwatch.config.json"
+    destination = "/tmp/cloudwatch.config.json
   }
   provisioner "file" {
     source      = "demo.sh"
