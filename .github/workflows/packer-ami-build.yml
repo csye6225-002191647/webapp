@@ -1,7 +1,10 @@
 name: Packer AMI Build CI
 
 on:
-  push:
+  pull_request:
+    types:
+      - opened
+      - synchronize
     branches:
       - main
 
