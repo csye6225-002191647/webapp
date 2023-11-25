@@ -1,8 +1,10 @@
 const db = require("../models/index");
 const Assignment = db.assignment;
+const Submission = db.submission;
 const l = require("lodash");
 const { setCustomHeaders } = require('../utils/setHeaders');
 const logger = require('../config/logger.config');
+const AWS = require('../config/aws.config');
 
 // Create and Save a new Assignment
 exports.createAssignment = async (req, res) => {
@@ -263,3 +265,71 @@ exports.updateAssignmentById = async (req, res) => {
     logger.warn(`Assignment does not exist`);
   }
 };
+
+exports.submitAssignmentbyId = async (req, res) => {
+  logger.info('Submitting Assignment');
+
+  try {
+    // Extract data from the request
+    const assignment_id = req.params.id
+    const submission_url = req.body.submission_url;
+
+    if (!submission_url) {
+      res.status(400).json({
+        message: "Content can not be empty!"
+      });
+      logger.error('Content can not be empty');
+      return;
+    }
+
+    // Check if assignment exists
+    const assignment = await Assignment.findByPk(assignment_id);
+    if (!assignment) {
+      return res.status(404).json({ error: 'Assignment not found' });
+    }
+
+    console.log('req.user', req.user)
+
+    if (assignment.user_id !== req.user.id) {
+      return res.status(400).json({ error: 'You are not authorized to submit this assignmen' });
+    }
+
+    // Check if the submission deadline has passed
+    const currentDate = new Date();
+    if (assignment.deadline < currentDate) {
+      return res.status(400).json({ error: 'Submission deadline has passed' });
+    }
+
+    // Check the number of submission attempts
+    const existingSubmissions = await Submission.count({
+      where: {
+        assignment_id,
+      },
+    });
+
+    if (existingSubmissions >= assignment.num_of_attempts) {
+      return res.status(400).json({ error: 'Exceeded maximum number of attempts' });
+    }
+
+    // Create Submission record
+    const newSubmission = await Submission.create({
+      assignment_id,
+      submission_url,
+    });
+
+    // Publish to SNS topic
+    const sns = new AWS.SNS();
+    // ${req.user.email}
+    const snsParams = {
+      Message: JSON.stringify({ email: 'rohitchouhancr07@gmail.com', url: submission_url }),
+      TopicArn: 'arn:aws:sns:us-east-1:392319571849:submissionUpdate-165a1bb'
+    };
+
+    await sns.publish(snsParams).promise();
+
+    res.status(201).json(newSubmission);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
