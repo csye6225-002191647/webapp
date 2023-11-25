@@ -15,6 +15,7 @@ db.sequelize = sequelize
 
 db.users = require('./user.model')(sequelize, Sequelize)
 db.assignment = require('./assignment.model')(sequelize, Sequelize)
+db.submission = require('./submission.model')(sequelize, Sequelize)
 
 const csvFilePath = '../users.csv'; // Replace with the path to your CSV file // Replace with the path to your CSV file
 
