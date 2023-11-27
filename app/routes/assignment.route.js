@@ -21,6 +21,6 @@ router.post('/', authorizeToken, createAssignment)
 router.get('/:id',authorizeToken, getAssignmentById)
 router.delete('/:id', authorizeToken, deleteAssignmentById)
 router.put('/:id', authorizeToken, updateAssignmentById)
-router.put('/:id/submission', authorizeToken, submitAssignmentbyId)
+router.post('/:id/submission', authorizeToken, submitAssignmentbyId)
 
 module.exports = router;

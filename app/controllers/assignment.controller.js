@@ -322,7 +322,7 @@ exports.submitAssignmentbyId = async (req, res) => {
     // ${req.user.email}
     const snsParams = {
       Message: JSON.stringify({ email: 'rohitchouhancr07@gmail.com', url: submission_url }),
-      TopicArn: 'arn:aws:sns:us-east-1:392319571849:submissionUpdate-165a1bb'
+      TopicArn: 'arn:aws:sns:us-east-1:392319571849:submissionUpdate-8faa655'
     };
 
     await sns.publish(snsParams).promise();
