@@ -5,6 +5,7 @@ const l = require("lodash");
 const { setCustomHeaders } = require('../utils/setHeaders');
 const logger = require('../config/logger.config');
 const AWS = require('../config/aws.config');
+const appConfig = require('../config/app.config');
 
 // Create and Save a new Assignment
 exports.createAssignment = async (req, res) => {
@@ -288,11 +289,14 @@ exports.submitAssignmentbyId = async (req, res) => {
       return res.status(404).json({ error: 'Assignment not found' });
     }
 
+    if (!assignment) {
+      return res.status(404).json({ error: 'Assignment not found' });
+    }
     console.log('req.user', req.user)
 
-    if (assignment.user_id !== req.user.id) {
-      return res.status(400).json({ error: 'You are not authorized to submit this assignmen' });
-    }
+    // if (assignment.user_id !== req.user.id) {
+    //   return res.status(400).json({ error: 'You are not authorized to submit this assignmen' });
+    // }
 
     // Check if the submission deadline has passed
     const currentDate = new Date();
@@ -304,6 +308,7 @@ exports.submitAssignmentbyId = async (req, res) => {
     const existingSubmissions = await Submission.count({
       where: {
         assignment_id,
+        email : req.user.email
       },
     });
 
@@ -315,14 +320,19 @@ exports.submitAssignmentbyId = async (req, res) => {
     const newSubmission = await Submission.create({
       assignment_id,
       submission_url,
+      email: req.user.email,
     });
 
     // Publish to SNS topic
     const sns = new AWS.SNS();
     // ${req.user.email}
     const snsParams = {
-      Message: JSON.stringify({ email: 'rohitchouhancr07@gmail.com', url: submission_url }),
-      TopicArn: 'arn:aws:sns:us-east-1:392319571849:submissionUpdate-8faa655'
+      Message: JSON.stringify({ 
+        email: req.user.email,
+        url: submission_url,
+        version : existingSubmissions
+      }),
+      TopicArn: appConfig.SNSTOPICARN
     };
 
     await sns.publish(snsParams).promise();

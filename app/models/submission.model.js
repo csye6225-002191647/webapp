@@ -14,6 +14,11 @@ const Submission = sequelize.define('Submission', {
       type: DataTypes.UUID,
       allowNull: false,
     },
+    email: {
+      type: DataTypes.STRING,
+      required: true,
+      allowNull: false,
+    },
     submission_url: {
       type: DataTypes.STRING,
       allowNull: false,
