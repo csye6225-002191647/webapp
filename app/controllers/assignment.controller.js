@@ -357,7 +357,7 @@ exports.submitAssignmentbyId = async (req, res) => {
         await sns.publish(snsParams).promise();
         
         setCustomHeaders(res);
-        res.status(201).json(newSubmission);
+        res.status(201).json(responseData);
         logger.info('Created Submission');
       })
       .catch(err => {
