@@ -272,6 +272,18 @@ exports.submitAssignmentbyId = async (req, res) => {
   logger.info('Submitting Assignment');
 
   try {
+    // Validate request
+    const allowedFields = ['submission_url'];
+    const bodyKeys = Object.keys(req.body);
+  
+    // Check if all fields in req.body are in the allowedFields array
+    const isValid = bodyKeys.every((field) => allowedFields.includes(field));
+  
+    if (!isValid) {
+      logger.error('Invalid fields in the request body');
+      return res.status(400).json({ error: 'Invalid fields in the request body' });
+    }
+
     // Extract data from the request
     const assignment_id = req.params.id
     const submission_url = req.body.submission_url;
@@ -287,21 +299,14 @@ exports.submitAssignmentbyId = async (req, res) => {
     // Check if assignment exists
     const assignment = await Assignment.findByPk(assignment_id);
     if (!assignment) {
+      logger.error('Assignment not found');
       return res.status(404).json({ error: 'Assignment not found' });
     }
-
-    if (!assignment) {
-      return res.status(404).json({ error: 'Assignment not found' });
-    }
-    console.log('req.user', req.user)
-
-    // if (assignment.user_id !== req.user.id) {
-    //   return res.status(400).json({ error: 'You are not authorized to submit this assignmen' });
-    // }
 
     // Check if the submission deadline has passed
     const currentDate = new Date();
     if (assignment.deadline < currentDate) {
+      logger.error('Submission deadline has passed')
       return res.status(400).json({ error: 'Submission deadline has passed' });
     }
 
@@ -309,36 +314,59 @@ exports.submitAssignmentbyId = async (req, res) => {
     const existingSubmissions = await Submission.count({
       where: {
         assignment_id,
-        email : req.user.email
+        email: req.user.email
       },
     });
 
     if (existingSubmissions >= assignment.num_of_attempts) {
+      logger.error('Exceeded maximum number of attempts')
       return res.status(400).json({ error: 'Exceeded maximum number of attempts' });
     }
 
     // Create Submission record
-    const newSubmission = await Submission.create({
+    const newSubmission = {
       assignment_id,
       submission_url,
-      email: req.user.email,
-    });
-
-    // Publish to SNS topic
-    const sns = new AWS.SNS();
-    // ${req.user.email}
-    const snsParams = {
-      Message: JSON.stringify({ 
-        email: req.user.email,
-        url: submission_url,
-        assignment: assignment.name
-      }),
-      TopicArn: appConfig.SNSTOPICARN
+      email: req.user.email
     };
 
-    await sns.publish(snsParams).promise();
+    Submission.create(newSubmission)
+      .then(async data => {
+        // Create a modified response object without email
+        const responseData = {
+          id: data.id, 
+          assignment_id: data.assignment_id,
+          submission_url: data.submission_url,
+          submission_date: data.submission_date,
+          submission_updated: data.submission_updated
+        };
 
-    res.status(201).json(newSubmission);
+        // Publish to SNS topic
+        const sns = new AWS.SNS();
+
+        const snsParams = {
+          Message: JSON.stringify({ 
+            email: req.user.email, 
+            url: submission_url,
+            assignment: assignment.name,
+            version: existingSubmissions
+          }),
+          TopicArn: appConfig.SNSTOPICARN
+        };
+
+        await sns.publish(snsParams).promise();
+        
+        setCustomHeaders(res);
+        res.status(201).json(newSubmission);
+        logger.info('Created Submission');
+      })
+      .catch(err => {
+        res.status(400).json({
+          message: err.message
+        });
+        logger.error(err.message);
+      });
+
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Internal Server Error' });

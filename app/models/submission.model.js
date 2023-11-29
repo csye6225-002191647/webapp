@@ -23,9 +23,12 @@ const Submission = sequelize.define('Submission', {
       type: DataTypes.STRING,
       allowNull: false,
       validate: {
-        isURL: true,
-      },
-    }
+        isURL: {
+          args: true,
+          msg:'Enter a valid URL'
+        }
+      }
+    },
   }, {
     timestamps: true,
     // I don't want createdAt

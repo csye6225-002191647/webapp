@@ -18,6 +18,10 @@ const Assignment = sequelize.define('Assignment', {
   name: {
     type: DataTypes.STRING,
     allowNull: false,
+    unique: {
+      msg: 'Assignment name should be unique',
+      fields: ['name'],
+    },
     validate: {
       notEmpty: true,
     },
