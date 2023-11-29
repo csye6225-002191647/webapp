@@ -290,9 +290,20 @@ exports.submitAssignmentbyId = async (req, res) => {
 
     if (!submission_url) {
       res.status(400).json({
-        message: "Content can not be empty!"
+        message: "Content cannot be empty!"
       });
-      logger.error('Content can not be empty');
+      logger.error('Content cannot be empty');
+      return;
+    }
+    
+    // Regex pattern for validating GitHub .zip URLs
+    const githubZipUrlRegex = /\.zip$/;
+    
+    if (!githubZipUrlRegex.test(submission_url)) {
+      res.status(400).json({
+        message: "Invalid submission URL format!"
+      });
+      logger.error('Invalid submission URL format');
       return;
     }
 
@@ -368,7 +379,9 @@ exports.submitAssignmentbyId = async (req, res) => {
       });
 
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
+    res.status(404).json({
+      message: "Assignment not found!"
+    });
+    logger.error(`Assignment not found`);
   }
 }
