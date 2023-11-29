@@ -6,7 +6,6 @@ const { setCustomHeaders } = require('../utils/setHeaders');
 const logger = require('../config/logger.config');
 const appConfig = require('../config/app.config');
 const AWS = require('aws-sdk');
-const appConfig = require('../config/app.config');
 
 AWS.config.update({ region: process.env.AWS_REGION });
 // Create and Save a new Assignment
