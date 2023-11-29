@@ -4,9 +4,11 @@ const Submission = db.submission;
 const l = require("lodash");
 const { setCustomHeaders } = require('../utils/setHeaders');
 const logger = require('../config/logger.config');
-const AWS = require('../config/aws.config');
+const appConfig = require('../config/app.config');
+const AWS = require('aws-sdk');
 const appConfig = require('../config/app.config');
 
+AWS.config.update({ region: process.env.AWS_REGION });
 // Create and Save a new Assignment
 exports.createAssignment = async (req, res) => {
   // Validate request
@@ -330,7 +332,7 @@ exports.submitAssignmentbyId = async (req, res) => {
       Message: JSON.stringify({ 
         email: req.user.email,
         url: submission_url,
-        version : existingSubmissions
+        assignment: assignment.name
       }),
       TopicArn: appConfig.SNSTOPICARN
     };
