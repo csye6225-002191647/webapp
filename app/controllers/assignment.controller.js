@@ -1,9 +1,13 @@
 const db = require("../models/index");
 const Assignment = db.assignment;
+const Submission = db.submission;
 const l = require("lodash");
 const { setCustomHeaders } = require('../utils/setHeaders');
 const logger = require('../config/logger.config');
+const appConfig = require('../config/app.config');
+const AWS = require('aws-sdk');
 
+AWS.config.update({ region: process.env.AWS_REGION });
 // Create and Save a new Assignment
 exports.createAssignment = async (req, res) => {
   // Validate request
@@ -263,3 +267,121 @@ exports.updateAssignmentById = async (req, res) => {
     logger.warn(`Assignment does not exist`);
   }
 };
+
+exports.submitAssignmentbyId = async (req, res) => {
+  logger.info('Submitting Assignment');
+
+  try {
+    // Validate request
+    const allowedFields = ['submission_url'];
+    const bodyKeys = Object.keys(req.body);
+  
+    // Check if all fields in req.body are in the allowedFields array
+    const isValid = bodyKeys.every((field) => allowedFields.includes(field));
+  
+    if (!isValid) {
+      logger.error('Invalid fields in the request body');
+      return res.status(400).json({ error: 'Invalid fields in the request body' });
+    }
+
+    // Extract data from the request
+    const assignment_id = req.params.id
+    const submission_url = req.body.submission_url;
+
+    if (!submission_url) {
+      res.status(400).json({
+        message: "Content cannot be empty!"
+      });
+      logger.error('Content cannot be empty');
+      return;
+    }
+    
+    // Regex pattern for validating GitHub .zip URLs
+    const githubZipUrlRegex = /\.zip$/;
+    
+    if (!githubZipUrlRegex.test(submission_url)) {
+      res.status(400).json({
+        message: "Invalid submission URL format!"
+      });
+      logger.error('Invalid submission URL format');
+      return;
+    }
+
+    // Check if assignment exists
+    const assignment = await Assignment.findByPk(assignment_id);
+    if (!assignment) {
+      logger.error('Assignment not found');
+      return res.status(404).json({ error: 'Assignment not found' });
+    }
+
+    // Check if the submission deadline has passed
+    const currentDate = new Date();
+    if (assignment.deadline < currentDate) {
+      logger.error('Submission deadline has passed')
+      return res.status(400).json({ error: 'Submission deadline has passed' });
+    }
+
+    // Check the number of submission attempts
+    const existingSubmissions = await Submission.count({
+      where: {
+        assignment_id,
+        email: req.user.email
+      },
+    });
+
+    if (existingSubmissions >= assignment.num_of_attempts) {
+      logger.error('Exceeded maximum number of attempts')
+      return res.status(400).json({ error: 'Exceeded maximum number of attempts' });
+    }
+
+    // Create Submission record
+    const newSubmission = {
+      assignment_id,
+      submission_url,
+      email: req.user.email
+    };
+
+    Submission.create(newSubmission)
+      .then(async data => {
+        // Create a modified response object without email
+        const responseData = {
+          id: data.id, 
+          assignment_id: data.assignment_id,
+          submission_url: data.submission_url,
+          submission_date: data.submission_date,
+          submission_updated: data.submission_updated
+        };
+
+        // Publish to SNS topic
+        const sns = new AWS.SNS();
+
+        const snsParams = {
+          Message: JSON.stringify({ 
+            email: req.user.email, 
+            url: submission_url,
+            assignment: assignment.name,
+            version: existingSubmissions
+          }),
+          TopicArn: appConfig.SNSTOPICARN
+        };
+
+        await sns.publish(snsParams).promise();
+        
+        setCustomHeaders(res);
+        res.status(201).json(responseData);
+        logger.info('Created Submission');
+      })
+      .catch(err => {
+        res.status(400).json({
+          message: err.message
+        });
+        logger.error(err.message);
+      });
+
+  } catch (error) {
+    res.status(404).json({
+      message: "Assignment not found!"
+    });
+    logger.error(`Assignment not found`);
+  }
+}

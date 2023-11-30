@@ -19,7 +19,7 @@ app.use((err, req, res, next) => {
 });
 
 // default route 
-app.get('/', function(req, res){
+app.get('/', function (req, res) {
   logger.info('Webapp successfully connected')
   res.writeHead(200, { "Content-Type": "text/plain" });
   res.end("Hello World\n");
@@ -34,19 +34,36 @@ app.use('/v1/assignments/:id', (req, res, next) => {
 });
 
 // Register routes
-app.use("/healthz",healthRoute);
-app.use("/v1/assignments",assignmentRoutes);
+app.use("/healthz", healthRoute);
+app.use("/v1/assignments", assignmentRoutes);
 
-//Catch-all for unsupported routes
-app.use((req, res) => {
+// Catch-all for unsupported routes
+app.use((req, res, next) => {
   if (req.originalUrl !== '/healthz' && req.originalUrl !== '/v1/assignments') {
-      logger.warn('Invalid route')
-      res.status(404).json();
-  } else if ((req.originalUrl == '/v1/assignments' && (req.method !== 'GET' || req.method !== 'POST' && req.method !== 'PUT' && req.method !== 'DELETE')) || ( req.originalUrl == '/healthz' && req.method !== 'GET' )){
-      logger.warn('Url is not supported')
+    if (
+      req.originalUrl.startsWith('/v1/assignments/') &&
+      req.originalUrl.endsWith('/submission') &&
+      req.method !== 'POST'
+    ){
+      // Allow only POST requests for /v1/assignments/:id/submission
+      logger.warn('Invalid method for /v1/assignments/:id/submission');
       res.status(405).json();
+    }else{
+      logger.warn('Invalid route');
+      res.status(404).json();
+    }
+  } else if (
+    (req.originalUrl == '/v1/assignments' && 
+      (req.method !== 'GET' || req.method !== 'POST' || req.method !== 'PUT' || req.method !== 'DELETE')) ||
+    (req.originalUrl == '/healthz' && req.method !== 'GET')
+  ) {
+    logger.warn('URL is not supported');
+    res.status(405).json();
+  }else {
+    next(); // Continue to the next middleware
   }
 });
+
 
 if (ENVIRONMENT !== 'TEST') {
   db.connectionTest()

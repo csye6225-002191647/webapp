@@ -6,7 +6,8 @@ const {
   DBPASSWORD,
   PORT,
   DATABASE,
-  DBPORT
+  DBPORT,
+  SNSTOPICARN
 } = process.env
 
 module.exports = {
@@ -25,5 +26,6 @@ module.exports = {
   DBPORT: DBPORT,
   METRICS_HOSTNAME: 'localhost',
   METRICS_PORT: 8125,
-  METRICS_PREFIX: 'csye6225_'
+  METRICS_PREFIX: 'csye6225_',
+  SNSTOPICARN: SNSTOPICARN
 }
