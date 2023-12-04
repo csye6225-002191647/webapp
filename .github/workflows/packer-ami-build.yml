@@ -74,11 +74,12 @@ jobs:
             echo "No launch templates found."
             exit 1
           fi
-          echo "launch_template_name=${launch_template_name}" >> $GITHUB_ENV
-          # version=$(aws ec2 describe-launch-template-versions --launch-template-name $launch_template_name --query 'LaunchTemplateVersions[-1].VersionNumber' --output text)
-          echo "version=${version}" >> $GITHUB_ENV
-          echo "::set-output name=lt_version::$version"
-
+          echo "LAUNCH_TEMPLATE_NAME=${launch_template_name}" >> $GITHUB_ENV
+          echo "Latest LAUNCH_TEMPLATE_NAME: $launch_template_name"
+          # version=$(aws ec2 describe-launch-templates --filters "Name=tag:Name,Values=asg_launch_config" --query 'LaunchTemplates[0].LaunchTemplateName.LastestVersionNumber' --output text)
+          echo "LAUNCH_TEMPLATE_VERSION=${version}" >> $GITHUB_ENV
+          echo "Latest LAUNCH_TEMPLATE_NAME: $version"
+          
       # - name: Refresh Auto Scaling Group Instances
       #   run: |
       #     aws autoscaling start-instance-refresh --auto-scaling-group-name webAppAutoScalingGroup --preferences "MinHealthyPercentage=100,InstanceWarmup=300,CheckpointDelay=300"
