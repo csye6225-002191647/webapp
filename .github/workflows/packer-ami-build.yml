@@ -99,7 +99,8 @@ jobs:
               echo "Instance refresh Cancelling."
               if [ "$status" == "Cancelled" ]; then
                 echo "Instance refresh Cancelled."
-                exit 0  
+                exit 0 
+              fi   
             elif [ "$status" == "Failed" ]; then
               echo "Instance refresh failed."
               exit 1
