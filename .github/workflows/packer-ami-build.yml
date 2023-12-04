@@ -64,7 +64,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_DEMO }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEMO }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: ${{ secrets.AWS_REGION }}    
 
       - name: Get Launch Template Latest Version
         id: get-lt-version
@@ -79,6 +79,14 @@ jobs:
           version=$(aws ec2 describe-launch-templates --filters "Name=tag:Name,Values=asg_launch_config" --query 'LaunchTemplates[0].LatestVersionNumber' --output text)
           echo "LAUNCH_TEMPLATE_VERSION=${version}" >> $GITHUB_ENV
           echo $version
+      
+      - name: Create Launch Template version
+        id: create-lt-version
+        run: |
+          # Your script/command to create a new Launch Template version with the latest AMI ID
+          # For example, using AWS CLI:
+          aws ec2 create-launch-template-version --launch-template-name $launch_template_name --version-description "New version with latest AMI" --source-version $version --output text
+          echo "Launch Template version created"    
           
       - name: Refresh Auto Scaling Group Instances
         run: |
