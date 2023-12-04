@@ -76,9 +76,9 @@ jobs:
           fi
           echo "LAUNCH_TEMPLATE_NAME=${launch_template_name}" >> $GITHUB_ENV
           echo "Latest LAUNCH_TEMPLATE_NAME: $launch_template_name"
-          version=$(aws ec2 describe-launch-templates --filters "Name=tag:Name,Values=asg_launch_config" --query 'LaunchTemplates[0].LaunchTemplateName.LastestVersionNumber' --output text)
+          version=$(aws ec2 describe-launch-templates --filters "Name=tag:Name,Values=asg_launch_config" --query 'LaunchTemplates[0].LatestVersionNumber' --output text)
           echo "LAUNCH_TEMPLATE_VERSION=${version}" >> $GITHUB_ENV
-          echo "Latest LAUNCH_TEMPLATE_VERSION: $version"
+          echo $version
           
       # - name: Refresh Auto Scaling Group Instances
       #   run: |
