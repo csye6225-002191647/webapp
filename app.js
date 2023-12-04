@@ -53,7 +53,7 @@ app.use((req, res, next) => {
       res.status(404).json();
     }
   } else if (
-    (req.originalUrl == '/v2/assignments' && 
+    (req.originalUrl == '/v1/assignments' && 
       (req.method !== 'GET' || req.method !== 'POST' || req.method !== 'PUT' || req.method !== 'DELETE')) ||
     (req.originalUrl == '/healthz' && req.method !== 'GET')
   ) {
