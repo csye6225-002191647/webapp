@@ -85,6 +85,7 @@ jobs:
         id: get-lt-version
         run: |
           version=$(aws ec2 describe-launch-template-versions --launch-template-name webAppLaunchTemplate-7a4adb4 --query 'LaunchTemplateVersions[-1].VersionNumber' --output text)
+          echo "version=${version}" >> $GITHUB_ENV
           echo "::set-output name=lt_version::$version"
 
       # - name: Refresh Auto Scaling Group Instances
