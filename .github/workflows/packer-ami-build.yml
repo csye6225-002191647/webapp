@@ -54,10 +54,10 @@ jobs:
       - name: Get Latest AMI ID
         id: get-ami
         run: | 
-          AMI_ID=$(packer build --var-file=./packer-ami/variables.pkrvars.hcl ./packer-ami/packer.pkr.hcl 2>&1 | sudo tee output.txt tail -2 output.txt | head -2 | awk 'match($0, /ami-.*/) { print substr($0, RSTART, RLENGTH) }' > sudo ami.txt)
-          echo $AMI_ID
-          echo "AMI_ID=${AMI_ID}" >> $GITHUB_ENV
-          echo "The AMI ID is: $AMI_ID"
+          latest_ami=$(aws ec2 describe-images --filters "Name=name,Values=debian_12_2023_12_04_02_33_58" --query "Images | [0].ImageId" --output text
+          echo "Latest AMI ID: $latest_ami"
+          echo "::set-output name=ami_id::$latest_ami"
+        
           
         # run: echo "::set-output name=ami_id::$(pulumi stack output amiId)"
 
