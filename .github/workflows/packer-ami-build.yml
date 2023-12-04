@@ -34,22 +34,22 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}  
 
-      - name: Build application artifact
-        run: |
-          mkdir artifacts
-          zip -r artifacts/webapp.zip . -x "*.git*"
+      # - name: Build application artifact
+      #   run: |
+      #     mkdir artifacts
+      #     zip -r artifacts/webapp.zip . -x "*.git*"
 
-      - name: Install Packer
-        run: |
-          curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
-          sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-          sudo apt-get update && sudo apt-get install packer
+      # - name: Install Packer
+      #   run: |
+      #     curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+      #     sudo apt-add-repository "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+      #     sudo apt-get update && sudo apt-get install packer
 
-      - name: Run Packer init
-        run: packer init ./packer-ami
+      # - name: Run Packer init
+      #   run: packer init ./packer-ami
 
-      - name: Build Packer AMI
-        run: packer build --var-file=./packer-ami/variables.pkrvars.hcl ./packer-ami/packer.pkr.hcl
+      # - name: Build Packer AMI
+      #   run: packer build --var-file=./packer-ami/variables.pkrvars.hcl ./packer-ami/packer.pkr.hcl
 
       - name: Get Latest AMI ID
         id: get-ami
@@ -79,7 +79,7 @@ jobs:
           version=$(aws ec2 describe-launch-templates --filters "Name=tag:Name,Values=asg_launch_config" --query 'LaunchTemplates[0].LatestVersionNumber' --output text)
           echo "LAUNCH_TEMPLATE_VERSION=${version}" >> $GITHUB_ENV
           echo $version
-          aws ec2 create-launch-template-version --launch-template-name $launch_template_name --version-description "New version with latest AMI" --source-version $version --launch-template-data "{\"ImageId\":\"${{env.AMI_ID}}\"}" --output text
+          aws ec2 create-launch-template-version --launch-template-name $launch_template_name --version-description "New version with latest AMI" --source-version \$Latest --launch-template-data "{\"ImageId\":\"${{env.AMI_ID}}\"}" --output text
           
       - name: Refresh Auto Scaling Group Instances
         run: |
