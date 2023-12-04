@@ -58,9 +58,6 @@ jobs:
           echo "AMI_ID=${latest_ami}" >> $GITHUB_ENV
           echo "Latest AMI ID: $latest_ami"
           echo "::set-output name=ami_id::$latest_ami" 
-        
-          
-        # run: echo "::set-output name=ami_id::$(pulumi stack output amiId)"
 
       - name: Configure AWS Credentials for Autoscaling Group
         uses: aws-actions/configure-aws-credentials@v1
@@ -69,22 +66,17 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEMO }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      # - name: Create Launch Template version
-      #   id: create-lt-version
-      #   run: |
-      #     # Your script/command to create a new Launch Template version with the latest AMI ID
-      #     # For example, using AWS CLI:
-      #       aws ec2 create-launch-template-version \
-      #       --launch-template-name webAppLaunchTemplate-7a4adb4 \
-      #       --version-description "New version with latest AMI" \
-      #       --source-version ${{ env.AMI_ID }} \
-      #       --output text
-      #     echo "Launch Template version created"
-
       - name: Get Launch Template Latest Version
         id: get-lt-version
         run: |
-          version=$(aws ec2 describe-launch-template-versions --launch-template-name webAppLaunchTemplate-7a4adb4 --query 'LaunchTemplateVersions[-1].VersionNumber' --output text)
+          
+          launch_template_name=$(aws ec2 describe-launch-templates --filters "Name=tag:Name,Values=asg_launch_config" --query 'LaunchTemplates[0].LaunchTemplateName' --output text)
+          if [ -z "$launch_template_name" ]; then
+            echo "No launch templates found."
+            exit 1
+          fi
+          echo "launch_template_name=${launch_template_name}" >> $GITHUB_ENV
+          version=$(aws ec2 describe-launch-template-versions --launch-template-name $launch_template_name --query 'LaunchTemplateVersions[-1].VersionNumber' --output text)
           echo "version=${version}" >> $GITHUB_ENV
           echo "::set-output name=lt_version::$version"
 
