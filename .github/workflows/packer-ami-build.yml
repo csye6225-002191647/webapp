@@ -1,7 +1,10 @@
 name: Packer AMI Build CI
 
 on:
-  push:
+  pull_request:
+    types:
+      - opened
+      - synchronize
     branches:
       - main
 
@@ -29,7 +32,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: ${{ secrets.AWS_REGION }}  
 
       - name: Build application artifact
         run: |
@@ -47,3 +50,59 @@ jobs:
 
       - name: Build Packer AMI
         run: packer build --var-file=./packer-ami/variables.pkrvars.hcl ./packer-ami/packer.pkr.hcl
+
+      - name: Get Latest AMI ID
+        id: get-ami
+        run: | 
+          AMI_ID=$(packer build --var-file=./packer-ami/variables.pkrvars.hcl ./packer-ami/packer.pkr.hcl 2>&1 | sudo tee output.txt tail -2 output.txt | head -2 | awk 'match($0, /ami-.*/) { print substr($0, RSTART, RLENGTH) }' > sudo ami.txt)
+          echo $AMI_ID
+          echo "AMI_ID=${AMI_ID}" >> $GITHUB_ENV
+          echo "The AMI ID is: $AMI_ID"
+          
+        # run: echo "::set-output name=ami_id::$(pulumi stack output amiId)"
+
+      # - name: Update Launch Template
+      #   run: |
+      #     pulumi up --skip-preview
+
+      # - name: Configure AWS Credentials for Autoscaling Group
+      #   uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      #     aws-region: ${{ secrets.AWS_REGION }}
+
+      # - name: Create Launch Template Version
+      #   run: |
+      #     latest_ami_id=$(cat ./.pulumi/stacks/$(pulumi stack)/last_update | jq -r .deployments[0].target)
+      #     aws ec2 create-launch-template-version --launch-template-name webAppLaunchTemplate --version-description "Updated AMI" --source-version "$latest_ami_id"
+
+      # - name: Get Launch Template Latest Version
+      #   id: get-lt-version
+      #   run: |
+      #     version=$(aws ec2 describe-launch-template-versions --launch-template-name webAppLaunchTemplate --query 'LaunchTemplateVersions[-1].VersionNumber' --output text)
+      #     echo "::set-output name=lt_version::$version"
+
+      # - name: Refresh Auto Scaling Group Instances
+      #   run: |
+      #     aws autoscaling start-instance-refresh --auto-scaling-group-name webAppAutoScalingGroup --preferences "MinHealthyPercentage=100,InstanceWarmup=300,CheckpointDelay=300"
+
+      # - name: Wait for Instance Refresh to Complete
+      #   id: wait-for-refresh
+      #   run: |
+      #     while true; do
+      #       status=$(aws autoscaling describe-instance-refreshes --auto-scaling-group-name webAppAutoScalingGroup --query 'InstanceRefreshes[0].Status' --output text)
+      #       if [ "$status" == "Successful" ]; then
+      #         echo "Instance refresh completed successfully."
+      #         exit 0
+      #       elif [ "$status" == "Failed" ]; then
+      #         echo "Instance refresh failed."
+      #         exit 1
+      #       else
+      #         echo "Instance refresh still in progress. Waiting..."
+      #         sleep 60
+      #       fi
+      #     done
+
+      # - name: Cleanup
+      #   run: pulumi destroy --skip-preview  
