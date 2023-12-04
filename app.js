@@ -25,7 +25,7 @@ app.get('/', function (req, res) {
   res.end("Hello World\n");
 });
 
-app.use('/v2/assignments/:id', (req, res, next) => {
+app.use('/v3/assignments/:id', (req, res, next) => {
   if (req.method === 'PATCH') {
     logger.warn('Patch not allowed on assignment')
     res.status(405).json();
@@ -35,25 +35,25 @@ app.use('/v2/assignments/:id', (req, res, next) => {
 
 // Register routes
 app.use("/healthz", healthRoute);
-app.use("/v2/assignments", assignmentRoutes);
+app.use("/v3/assignments", assignmentRoutes);
 
 // Catch-all for unsupported routes
 app.use((req, res, next) => {
-  if (req.originalUrl !== '/healthz' && req.originalUrl !== '/v2/assignments') {
+  if (req.originalUrl !== '/healthz' && req.originalUrl !== '/v3/assignments') {
     if (
-      req.originalUrl.startsWith('/v2/assignments/') &&
+      req.originalUrl.startsWith('/v3/assignments/') &&
       req.originalUrl.endsWith('/submission') &&
       req.method !== 'POST'
     ){
-      // Allow only POST requests for /v2/assignments/:id/submission
-      logger.warn('Invalid method for /v2/assignments/:id/submission');
+      // Allow only POST requests for /v3/assignments/:id/submission
+      logger.warn('Invalid method for /v3/assignments/:id/submission');
       res.status(405).json();
     }else{
       logger.warn('Invalid route');
       res.status(404).json();
     }
   } else if (
-    (req.originalUrl == '/v1/assignments' && 
+    (req.originalUrl == '/v3/assignments' && 
       (req.method !== 'GET' || req.method !== 'POST' || req.method !== 'PUT' || req.method !== 'DELETE')) ||
     (req.originalUrl == '/healthz' && req.method !== 'GET')
   ) {
