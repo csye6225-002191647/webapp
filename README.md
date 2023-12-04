@@ -1,185 +1,177 @@
-demodemo
-The provided README.md file offers a good starting point for managing your Infrastructure as Code (IaC) using Pulumi to create and manage AWS networking resources. However, there are some specific requirements for your assignment that are not covered in the README. Let's modify the README.md to include those additional requirements:
+# Health Check RESTful API
+test
+## Introduction
 
-```markdown.
-# iac-pulumi
+This Node.js application provides a Health Check RESTful API to monitor the health of the application instance and alert us when something is not working as expected. It helps us improve user experience by avoiding routing user requests to unhealthy instances. The primary purpose of this API is to answer the question, "How to detect that a running service instance is unable to handle requests?"
 
-This GitHub repository is set up to manage the Infrastructure as Code (IaC) using Pulumi for creating and managing AWS networking resources. The infrastructure setup includes creating Virtual Private Cloud (VPC), subnets, route tables, and an Internet Gateway. This repository is intended for use in your AWS environment, allowing you to create multiple VPCs with varying configurations using Pulumi stacks.
+The Healthz Check API performs the following checks:
 
-## Repository Structure
-- `README.md` (This file): Provides an overview and instructions for setting up the infrastructure.
-- `.gitignore`: Contains a suitable .gitignore file for this project.
-- `pulumi/`: This directory contains the Pulumi project and code for managing AWS networking resources.
-- `pulumi/dev`: Contains Pulumi stack configuration for the development environment.
-- `pulumi/demo`: Contains Pulumi stack configuration for the demo environment.
+1. **Database Connection**: Ensures that the application is connected to the database or can establish a connection during the healthz check.
+
+2. **Downstream API Calls**: Verifies the availability of downstream APIs that the application depends on. An outage of downstream APIs, without which the application cannot complete user requests, will be detected.
+
+## Users & User Accounts
+
+### User Data Source
+
+The application loads user account information from a CSV file located at `/opt/user.csv` during startup. It creates users based on the information provided in the CSV file. If a user account already exists, no updates are made. Deletion of user accounts is not supported.
+
+### User Authentication
+
+To access authenticated endpoints, users must provide a basic authentication token. The application supports only Token-Based authentication, not Session Authentication.
+
+### API Implementation
+
+The following API endpoints are implemented:
+
+1. **Create Assignment**: Any authenticated user can add an assignment. Assignment points must be between 1 and 10.
+
+2. **Update Assignment**: Only the user who created the assignment can update it. Users can use either the PUT API for updates.
+
+3. **Delete Assignment**: Only the user who created the assignment can delete it.
+
+Users should not be able to set values for `assignment_created` and `assignment_updated`. Any value provided for these fields will be ignored.
+
+## Continuous Integration (CI) with GitHub Actions
+
+We have implemented Continuous Integration (CI) using GitHub Actions to run integration tests for the application. The following steps are taken:
+
+1. A GitHub Actions workflow is defined to run integration tests for each pull request.
+
+2. A pull request can only be merged if the workflow executes successfully.
+
+3. GitHub branch protection is enabled to prevent users from merging a pull request when the GitHub Actions workflow run fails.
+
+4. The CI check runs the integration tests for the `/healthz` endpoint. These tests ensure that the healthz check API meets its success criteria.
+
+## Integration Tests
+
+Integration tests are implemented for the `/healthz` endpoint. These tests focus on verifying the success criteria and do not test for failures. To run these tests, a GitHub action installs and sets up MySQL and PostgreSQL instances, providing configuration to the application to connect to them.
 
 ## Getting Started
 
-### 1. Setting up the GitHub Repository
+To get started with this Node.js application, follow these steps:
 
-- Create a new private GitHub repository in your GitHub organization with the name "iac-pulumi."
-- Fork this repository into your GitHub namespace. All development work should be done on your forked repository.
-- Clone the forked repository to your local development environment.
+1. Clone this repository to your local machine.
 
-### 2. AWS Networking Setup
+2. Install the required dependencies using `npm install`.
 
-To set up the AWS networking infrastructure as described, follow these steps:
+3. Set up the database configuration in your environment.
 
-- Create a Virtual Private Cloud (VPC).
-- Create three public subnets and three private subnets, each in a different availability zone within the same region and VPC.
-- Create an Internet Gateway resource and attach it to the VPC.
-- Create a public route table and associate all public subnets with it.
-- Create a private route table and associate all private subnets with it.
-- Create a public route in the public route table with a destination CIDR block of `0.0.0.0/0` and the Internet Gateway as the target.
+4. Create the user account CSV file at `/opt/user.csv` or provide an alternative path as needed.
 
-### 3. Infrastructure as Code with Pulumi
+5. Run the application using `npm start`.
 
-- Install and set up the AWS Command Line Interface (CLI) on your local machine.
-- Write Pulumi code using a high-level language like JavaScript to define and manage the networking resources in your AWS environment. Ensure that values are not hard-coded in your code, making it reusable for creating multiple VPCs and associated resources.
+6. Access the API endpoints as described in the [API specifications](https://app.swaggerhub.com/apis-docs/csye6225-webapp/cloud-native-webapp/fall2023-a3).
 
-## Pulumi Stack Configuration
+# GitHub Action Workflow - Packer Status Check
 
-To create multiple VPCs with different configurations, we have set up two Pulumi stacks: `dev` and `demo`. Each stack can be used to deploy the infrastructure in different AWS accounts or regions. To switch between stacks, use the following Pulumi commands:
+This GitHub Action workflow is designed to ensure that your Packer templates are correctly formatted and validated before any Pull Requests are merged into the repository. It enforces strict quality control on Packer templates to maintain consistency and reliability.
 
-- `pulumi stack select dev`: Switch to the development stack.
-- `pulumi stack select demo`: Switch to the demo stack.
+## Purpose
+The primary purposes of this workflow are:
 
-Remember to set up Pulumi configurations for different AWS accounts and regions in each stack as needed.
+1. Validate Packer Template: Ensure that Packer templates are correctly formatted. It checks for issues like missing closing brackets or syntax errors.
 
-## Deploying the Pulumi Stacks
+2. Prevent Merging of PRs with Invalid Templates: It does not allow Pull Requests to be merged if the Packer template is not correctly formatted.
 
-To create the VPC and associated resources using Pulumi, you can use the following instructions for each of the two stacks (dev and demo).
+3. Non-Building Workflow: Note that this workflow does not build the Amazon Machine Image (AMI). It's purely for checking the template's integrity.
 
-### For the `dev` Stack
+4. Restrict to Organization Repository: The workflow is configured to run only on the organization's repository, not on any forked repositories.
 
-1. Make sure you have selected the `dev` stack using the Pulumi CLI:
+## How to Test
+To test this workflow, you can follow these steps:
 
-   ```bash
-   pulumi stack select dev
-   ```
+1. Create a Pull Request with a Packer template that is not correctly formatted.
+2. Observe that the workflow fails and prevents the PR from being merged.
 
-2. Run the `pulumi up` command to create the resources associated with the `dev` stack:
+---
 
-   ```bash
-   pulumi up
-   ```
+# GitHub Action Workflow - Packer AMI Build
 
-3. Review the changes and confirm the creation of resources when prompted.
+This GitHub Action workflow is responsible for building an Amazon Machine Image (AMI) only after a Pull Request is merged. It ensures that the AMI is built correctly with specific configurations.
 
-### For the `demo` Stack
+## Purpose
+The main objectives of this workflow are:
 
-1. Make sure you have selected the `demo` stack using the Pulumi CLI:
+**Post-Merge Build** It runs only after a Pull Request is successfully merged into the main branch. It should not run when a Pull Request is raised.
 
-   ```bash
-   pulumi stack select demo
-   ```
+**AMI Building and Sharing** The workflow builds an AMI in the DEV account and shares it with the DEMO account.
 
-2. Run the `pulumi up` command to create the resources associated with the `demo` stack:
+**Private AMI:** The resulting AMI is set to be private, ensuring that it's not accessible to the public.
 
-   ```bash
-   pulumi up
-   ```
+**Debian 12 as Source Image:** The AMI uses Debian 12 as the source image.
 
-3. Review the changes and confirm the creation of resources when prompted.
+**No Hard-Coded Values:** The Packer template is expected to be free of hard-coded values, promoting best practices for configuration management.
 
-After successfully running the `pulumi up` command for each stack, the VPC and its associated resources will be created in your AWS account.
+**No AWS Credentials:** The Packer template should not contain AWS credentials, following a secure approach to image building.
 
-**Note**: Be cautious when using the `pulumi up` command, as it may result in costs associated with AWS resources. Ensure that you want to deploy the resources before confirming the operation.
+**Create a new Launch Template version:** After the AMI is successfully built, the workflow creates a new Launch Template version with the latest AMI ID for the autoscaling group.
 
-Please review the changes and configurations before proceeding to create the resources.
+**Instance Refresh for Auto-Scaling Group:** The workflow issues a command to the auto-scaling group to perform an instance refresh using the AWS CLI.
 
-## Destroying the VPC and Associated Resources
+**Wait for Instance Refresh:** The GitHub Actions workflow must wait for the instance refresh to complete before exiting. The status of the GitHub Actions workflow must match the status of the instance refresh command.
 
-To tear down the VPC and associated resources created with Pulumi, you can use the following instructions for each of the two stacks (dev and demo).
+## How to Test
+To test this workflow, follow these steps:
 
-### For the `dev` Stack
+1. Create a Pull Request with a correctly formatted Packer template.
 
-1. Make sure you have selected the `dev` stack using the Pulumi CLI:
+2. After the PR is merged, observe that the workflow initiates and successfully builds the AMI with the specified configurations.
 
-   ```bash
-   pulumi stack select dev
-   ```
+Please ensure that your GitHub Actions and AWS credentials are properly configured for these workflows to work seamlessly.
 
-2. Run the `pulumi destroy` command to remove the resources associated with the `dev` stack:
+# Assignment - 06
 
-   ```bash
-   pulumi destroy
-   ```
-
-3. Confirm the destruction of resources when prompted.
-
-### For the `demo` Stack
-
-1. Make sure you have selected the `demo` stack using the Pulumi CLI:
-
-   ```bash
-   pulumi stack select demo
-   ```
-
-2. Run the `pulumi destroy` command to remove the resources associated with the `demo` stack:
-
-   ```bash
-   pulumi destroy
-   ```
-
-3. Confirm the destruction of resources when prompted.
-
-After successfully running the `pulumi destroy` command for each stack, the VPC and its associated resources will be deleted from your AWS account.
-
-**Note**: Be cautious when using the `pulumi destroy` command, as it permanently deletes resources. Ensure that you want to destroy the resources before confirming the operation.
-
-Please ensure that you have backups or snapshots of any critical data or configurations that you may need in the future before destroying the resources.
-
-## Additional Assignment Requirements
-
-For this assignment, some additional requirements must be met:
-
-- Students must be able to SSH into the EC2 instance created and start their application.
-- All APIs implemented in previous assignments, including the health check endpoint, must be tested.
-- Dependencies should have been pre-installed and set up when the AMI was built. No running of `npm install` or `pip install` should be required.
-- The database (MySQL/MariaDB on port 3306 or PostgreSQL on port 5432) should be running locally on the EC2 instance. Database ports should not be included in the security group, preventing external access to the database.
-- Ensure that Git is not installed in the AMI by checking for it using the `which git` command.
-
-Please make sure to modify your Pulumi scripts to meet these requirements for your assignment.
-```
-
-The updated README.md now includes the additional assignment requirements related to SSH access, testing APIs, pre-installed dependencies, and database and Git configuration. Make sure to adjust your Pulumi scripts accordingly to meet these requirements.
-
-Assignment - 06 
-
-# Web Application Readme
-
-This readme offers a comprehensive guide for setting up and configuring the web application. Please adhere to the instructions below to ensure a seamless deployment and implementation of the application.
+This document provides a comprehensive guide to the setup and configuration of the web application. Please follow the instructions below to ensure a successful deployment and implementation of the application.
 
 ## Prerequisites
 
-1. An AWS account with the required permissions for creating EC2 instances, RDS instances, and other essential resources.
-2. Pulumi CLI installation with appropriate credentials configured.
-3. Familiarity with Systemd or equivalent tools for setting up automatic execution.
-4. Understanding of managing cloud-init processes and userdata scripts on AWS.
+1. AWS account with necessary permissions to create EC2 instances, RDS instances, and other required resources.
+2. Pulumi CLI installed and configured with appropriate credentials.
+3. Familiarity with Systemd or an alternative tool for setting up autorun.
+4. Understanding of how to manage cloud-init processes and userdata scripts on AWS.
 
 ## Setup Instructions
 
 ### 1. Launching the EC2 Instance and RDS
 
-- Execute Pulumi with the provided codebase to initiate the EC2 instance and RDS. Ensure that the web application uses the RDS instance created during this process.
-- Be sure to set up the correct security groups and network configurations for the EC2 and RDS instances to facilitate communication.
+- Run Pulumi with the provided codebase to launch the EC2 instance and RDS. Ensure that the web application's database is the RDS instance created during this process.
+- Make sure to configure the appropriate security groups and network settings for the EC2 instance and RDS instance to allow for communication between the two.
 
 ### 2. Configuring Autorun Using Systemd
 
-- Employ Systemd or an alternative of your choice to set up autorun for the web application.
-- To ensure that the service initiates after the completion of cloud-init, designate it as required or wanted by cloud-init, rather than the typical multi-user. For additional guidance, refer to [this link](https://serverfault.com/a/937723).
+- Utilize Systemd or any alternative tool of your choice to configure autorun for the web application.
+- To ensure that the service starts after cloud-init has completed execution, set it to be required or wanted by cloud-init instead of the usual multi-user. Refer to https://serverfault.com/a/937723 for additional guidance on this process.
 
-### 3. Setting Up Integration Tests
+### 3. Integration Tests Setup
 
-- For integration tests within your GitHub Actions, configure a local database on the EC2 instance for testing purposes.
-- Arrange the necessary scripts and environments in your GitHub Actions workflow to ensure seamless integration testing.
+- For integration tests in your GitHub Actions, set up a local database on the EC2 instance that can be used for testing purposes.
+- Configure the necessary scripts and environments for your GitHub Actions workflow to ensure smooth integration testing.
 
 ## Additional Notes
 
-- Regularly monitor application logs and AWS resources to maintain smooth functionality and performance.
+- Regularly monitor the application logs and AWS resources to ensure smooth functionality and performance.
 - Document any changes made to the setup or configuration for future reference.
-- Adhere to security best practices and ensure secure storage and access of sensitive information.
+- Follow security best practices and ensure that all sensitive information is securely stored and accessed.
 
----
-By following these guidelines, you can successfully establish and manage the web application, including the required autorun and integration testing configurations. okok
+# Assignment - 09 
+## Assignment Submission System
+
+### Submission Guidelines
+
+1. **Making POST Requests**: Users can make POST requests to submit their assignments. The API endpoint for submission is:
+
+    ```
+    POST /submit
+    ```
+
+    Include the necessary data in the request body according to the assignment requirements.
+
+2. **Multiple Submission Attempts**: Users are allowed to submit multiple times for each assignment based on the specified retry configuration. The retry configuration is set externally and should be considered when submitting multiple times.
+
+3. **Rejection on Exceeding Retries**: If a user exceeds the allowed number of retries for a specific assignment, the submission request will be rejected. Make sure to adhere to the retry configuration to avoid rejections.
+
+4. **Rejection on Deadline Expiry**: Submissions will be rejected if the due date (deadline) for the assignment has passed. Ensure that your submission is made before the specified deadline.
+
+5. **SNS Topic Notification**: Upon successful submission, the system will post the URL to the SNS (Simple Notification Service) topic. Additionally, user information, such as their email address, will be included in the notification.
