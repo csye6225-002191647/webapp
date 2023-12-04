@@ -69,14 +69,13 @@ jobs:
       - name: Get Launch Template Latest Version
         id: get-lt-version
         run: |
-          
           launch_template_name=$(aws ec2 describe-launch-templates --filters "Name=tag:Name,Values=asg_launch_config" --query 'LaunchTemplates[0].LaunchTemplateName' --output text)
           if [ -z "$launch_template_name" ]; then
             echo "No launch templates found."
             exit 1
           fi
           echo "launch_template_name=${launch_template_name}" >> $GITHUB_ENV
-          version=$(aws ec2 describe-launch-template-versions --launch-template-name $launch_template_name --query 'LaunchTemplateVersions[-1].VersionNumber' --output text)
+          # version=$(aws ec2 describe-launch-template-versions --launch-template-name $launch_template_name --query 'LaunchTemplateVersions[-1].VersionNumber' --output text)
           echo "version=${version}" >> $GITHUB_ENV
           echo "::set-output name=lt_version::$version"
 
