@@ -80,26 +80,29 @@ jobs:
           echo "LAUNCH_TEMPLATE_VERSION=${version}" >> $GITHUB_ENV
           echo $version
           
-      # - name: Refresh Auto Scaling Group Instances
-      #   run: |
-      #     aws autoscaling start-instance-refresh --auto-scaling-group-name webAppAutoScalingGroup --preferences "MinHealthyPercentage=100,InstanceWarmup=300,CheckpointDelay=300"
+      - name: Refresh Auto Scaling Group Instances
+        run: |
+          asg_name=$(aws autoscaling describe-auto-scaling-groups --query "AutoScalingGroups[?Tags[?Key=='Name' && Value=='instance']].AutoScalingGroupName" --output text)
+          aws autoscaling start-instance-refresh --auto-scaling-group-name $asg_name --preferences "MinHealthyPercentage=100,InstanceWarmup=300,CheckpointDelay=300"
+          echo "ASG_NAME=${asg_name}" >> $GITHUB_ENV
+          echo $asg_name
 
-      # - name: Wait for Instance Refresh to Complete
-      #   id: wait-for-refresh
-      #   run: |
-      #     while true; do
-      #       status=$(aws autoscaling describe-instance-refreshes --auto-scaling-group-name webAppAutoScalingGroup --query 'InstanceRefreshes[0].Status' --output text)
-      #       if [ "$status" == "Successful" ]; then
-      #         echo "Instance refresh completed successfully."
-      #         exit 0
-      #       elif [ "$status" == "Failed" ]; then
-      #         echo "Instance refresh failed."
-      #         exit 1
-      #       else
-      #         echo "Instance refresh still in progress. Waiting..."
-      #         sleep 60
-      #       fi
-      #     done
+      - name: Wait for Instance Refresh to Complete
+        id: wait-for-refresh
+        run: |
+          while true; do
+            status=$(aws autoscaling describe-instance-refreshes --auto-scaling-group-name ${{env.ASG_NAME}} --query 'InstanceRefreshes[0].Status' --output text)
+            if [ "$status" == "Successful" ]; then
+              echo "Instance refresh completed successfully."
+              exit 0
+            elif [ "$status" == "Failed" ]; then
+              echo "Instance refresh failed."
+              exit 1
+            else
+              echo "Instance refresh still in progress. Waiting..."
+              sleep 60
+            fi
+          done
 
       # - name: Cleanup
       #   run: pulumi destroy --skip-preview  
