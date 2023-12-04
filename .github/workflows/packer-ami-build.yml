@@ -54,7 +54,7 @@ jobs:
       - name: Get Latest AMI ID
         id: get-ami
         run: | 
-          latest_ami=$(aws ec2 describe-images --filters "Name=name,Values=debian_12_2023_12_04_02_33_58" --query "Images | [0].ImageId" --output text
+          latest_ami=$(aws ec2 describe-images --filters "Name=name,Values=debian_12_2023_12_04_02_33_58" --query "Images | [0].ImageId" --output text)
           echo "Latest AMI ID: $latest_ami"
           echo "::set-output name=ami_id::$latest_ami"
         
