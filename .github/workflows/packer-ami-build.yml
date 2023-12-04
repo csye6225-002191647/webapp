@@ -48,8 +48,8 @@ jobs:
       - name: Run Packer init
         run: packer init ./packer-ami
 
-      # - name: Build Packer AMI
-      #   run: packer build --var-file=./packer-ami/variables.pkrvars.hcl ./packer-ami/packer.pkr.hcl
+      - name: Build Packer AMI
+        run: packer build --var-file=./packer-ami/variables.pkrvars.hcl ./packer-ami/packer.pkr.hcl
 
       - name: Get Latest AMI ID
         id: get-ami
@@ -95,6 +95,11 @@ jobs:
             if [ "$status" == "Successful" ]; then
               echo "Instance refresh completed successfully."
               exit 0
+            elif [ "$status" == "Cancelling" ]; then
+              echo "Instance refresh Cancelling."
+              if [ "$status" == "Cancelled" ]; then
+                echo "Instance refresh Cancelled."
+                exit 0  
             elif [ "$status" == "Failed" ]; then
               echo "Instance refresh failed."
               exit 1
