@@ -83,7 +83,7 @@ jobs:
       - name: Refresh Auto Scaling Group Instances
         run: |
           asg_name=$(aws autoscaling describe-auto-scaling-groups --query "AutoScalingGroups[?Tags[?Key=='Name' && Value=='instance']].AutoScalingGroupName" --output text)
-          aws autoscaling start-instance-refresh --auto-scaling-group-name "$asg_name" --stratergy "Rolling" --preferences "MinHealthyPercentage=100,InstanceWarmup=300,CheckpointDelay=300" 
+          aws autoscaling start-instance-refresh --auto-scaling-group-name $asg_name --strategy Rolling --preferences "MinHealthyPercentage=100,InstanceWarmup=300,CheckpointDelay=300" 
           echo "ASG_NAME=${asg_name}" >> $GITHUB_ENV
           echo $asg_name
 
